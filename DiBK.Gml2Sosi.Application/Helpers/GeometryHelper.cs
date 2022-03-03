@@ -29,17 +29,17 @@ namespace DiBK.Gml2Sosi.Application.Helpers
             return new LineString(coordinates);
         }
 
-        public static List<SosiPoint> GetSosiPoints(XElement geomElement)
+        public static List<SosiPoint> GetSosiPoints(XElement geomElement, double resolution)
         {
             return GetCoordinates(geomElement)
-                .Select(coordPair => SosiPoint.Create(coordPair[0], coordPair[1]))
+                .Select(coordPair => SosiPoint.Create(coordPair[0], coordPair[1], resolution))
                 .ToList();
         }
 
-        public static List<SosiPoint> GetSosiPoints(LineString lineString)
+        public static List<SosiPoint> GetSosiPoints(LineString lineString, double resolution)
         {
             return lineString.GetPoints()
-                .Select(point => SosiPoint.Create(point.X, point.Y))
+                .Select(point => SosiPoint.Create(point.X, point.Y, resolution))
                 .ToList();
         }
 

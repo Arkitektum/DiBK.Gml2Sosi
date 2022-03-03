@@ -42,7 +42,7 @@ namespace DiBK.Gml2Sosi.Application.Helpers
             return null;
         }
 
-        public static string GetLokalId(XElement element)
+        public static string GetLocalId(XElement element)
         {
             var featureElement = GmlHelper.GetFeatureElement(element);
 

@@ -9,12 +9,9 @@
   <ItemGroup>
     <PackageReference Include="MaxRev.Gdal.Core" Version="3.3.3.110" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.14" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="NetTopologySuite" Version="2.4.0" />
     <PackageReference Include="XPath2" Version="1.1.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Mappers\" />
   </ItemGroup>
 
 </Project>

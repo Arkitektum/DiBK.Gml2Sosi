@@ -2,7 +2,6 @@
 {
     public class SosiPoint
     {
-        private const double DatasetResolution = 0.01;
         public long X { get; set; }
         public long Y { get; set; }
         public bool IsNode { get; set; }
@@ -44,14 +43,14 @@
             };
         }
 
-        public static SosiPoint Create(double x, double y)
+        public static SosiPoint Create(double x, double y, double resolution)
         {
-            return new SosiPoint(AdjustCoordinate(x), AdjustCoordinate(y));
+            return new SosiPoint(AdjustCoordinate(x, resolution), AdjustCoordinate(y, resolution));
         }
 
-        private static long AdjustCoordinate(double coordinate)
+        private static long AdjustCoordinate(double coordinate, double resolution)
         {
-            return (long)Math.Round(coordinate / DatasetResolution, 0);
+            return (long)Math.Round(coordinate / resolution, 0);
         }
     }
 }

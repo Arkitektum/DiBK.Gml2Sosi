@@ -1,5 +1,4 @@
-﻿using DiBK.Gml2Sosi.Application.Attributes;
-using DiBK.Gml2Sosi.Application.Helpers;
+﻿using DiBK.Gml2Sosi.Application.Helpers;
 using DiBK.Gml2Sosi.Application.Models.Geometries;
 using System.Xml.Linq;
 
@@ -7,10 +6,6 @@ namespace DiBK.Gml2Sosi.Application.Models.SosiObjects
 {
     public abstract class SosiSurfaceObject : SosiObjectType
     {
-        /*[SosiProperty("..NASJONALAREALPLANID", 5)]
-        public NasjonalArealplanId NasjonalArealplanId { get; set; }*/
-        [SosiProperty("..VERTNIV", 6)]
-        public string Vertikalnivå { get; set; }
         public string Referanser { get; private set; }
         public SosiPoint Representasjonspunkt { get; private set; }
 
@@ -58,7 +53,7 @@ namespace DiBK.Gml2Sosi.Application.Models.SosiObjects
             Referanser = refs;
         }
 
-        public void SetPointOnSurface(XElement geomElement)
+        public void SetPointOnSurface(XElement geomElement, double resolution)
         {
             using var surfaceGeometry = GeometryHelper.OgrGeometryFromGml(geomElement);
 
@@ -67,7 +62,7 @@ namespace DiBK.Gml2Sosi.Application.Models.SosiObjects
 
             using var point = surfaceGeometry.PointOnSurface();
 
-            Representasjonspunkt = SosiPoint.Create(point.GetX(0), point.GetY(0));
+            Representasjonspunkt = SosiPoint.Create(point.GetX(0), point.GetY(0), resolution);
         }
     }
 }

@@ -11,11 +11,11 @@ namespace DiBK.Gml2Sosi.Application.Models.SosiObjects
         [SosiProperty("..OMRÅDE", 2)]
         public Område Område { get; set; }
         [SosiProperty("..SOSI-VERSJON", 3)]
-        public string SosiVersjon { get; } = "4.5";
+        public string SosiVersjon { get; set; }
         [SosiProperty("..SOSI-NIVÅ", 4)]
-        public string SosiNivå { get; } = "4";
+        public string SosiNivå { get; set; }
         [SosiProperty("..OBJEKTKATALOG", 5)]
-        public string Objektkatalog { get; } = "Regplanforslag 20190401 * Arealplan Reguleringsplanforslag";
+        public string Objektkatalog { get; set; }
         public override string ElementName => ".HODE";
 
         public override void WriteToStream(StreamWriter streamWriter)

@@ -7,10 +7,10 @@ namespace DiBK.Gml2Sosi.Application.Models.SosiObjects
         [SosiProperty("...KOORDSYS", 0)]
         public string Koordinatsystem { get; set; }
         [SosiProperty("...VERT-DATUM", 1)]
-        public string VertikaltDatum { get; } = "NN2000";
+        public string VertikaltDatum { get; set; }
         [SosiProperty("...ORIGO-NØ", 2)]
         public string OrigoNordØst { get; } = "0 0";
         [SosiProperty("...ENHET", 3)]
-        public string Enhet { get; } = "0.01";
+        public string Enhet { get; set; }
     }
 }
