@@ -1,5 +1,6 @@
 ﻿using DiBK.Gml2Sosi.Application.Helpers;
 using DiBK.Gml2Sosi.Application.Mappers.Interfaces;
+using DiBK.Gml2Sosi.Application.Models.Config;
 using DiBK.Gml2Sosi.Application.Models.SosiObjects;
 using System.Xml.Linq;
 using Wmhelp.XPath2;
@@ -9,7 +10,7 @@ namespace DiBK.Gml2Sosi.Application.Mappers
     public class HodeMapper : IHodeMapper
     {
         public void Map(
-            XDocument document, string sosiVersion, string sosiLevel, string objectCatalog, double resolution, string verticalDatum, List<SosiElement> sosiElements)
+            XDocument document, DatasetSettings datasetSettings, List<SosiElement> sosiElements)
         {
             var srsNameElement = document.Root.Descendants()
                 .FirstOrDefault(element => element.Attribute("srsName") != null);
@@ -20,13 +21,13 @@ namespace DiBK.Gml2Sosi.Application.Mappers
 
             var hode = new Hode
             {
-                SosiVersjon = sosiVersion,
-                SosiNivå = sosiLevel,
-                Objektkatalog = objectCatalog,
+                SosiVersjon = datasetSettings.SosiVersion,
+                SosiNivå = datasetSettings.SosiLevel,
+                Objektkatalog = datasetSettings.ObjectCatalog,
                 Transpar = new()
                 {
-                    Enhet = resolution.ToString(),
-                    VertikaltDatum = verticalDatum,
+                    Enhet = datasetSettings.Resolution.ToString(),
+                    VertikaltDatum = datasetSettings.VerticalDatum,
                     Koordinatsystem = GmlHelper.GetCoordinateSystem(srsNameElement?.Attribute("srsName").Value)
                 },
                 Område = new()

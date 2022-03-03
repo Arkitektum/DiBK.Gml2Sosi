@@ -21,7 +21,7 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
         public RpJuridiskPunktMapper(
             ISosiObjectTypeMapper sosiObjectTypeMapper,
             ISosiMapper<NasjonalArealplanId> nasjonalArealplanIdMapper,
-            IOptions<DatasetConfig> options)
+            IOptions<DatasetConfiguration> options)
         {
             _sosiObjectTypeMapper = sosiObjectTypeMapper;
             _nasjonalArealplanIdMapper = nasjonalArealplanIdMapper;

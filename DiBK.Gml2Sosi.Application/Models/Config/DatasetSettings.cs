@@ -6,5 +6,6 @@
         public string SosiLevel { get; set; }
         public string ObjectCatalog { get; set; }
         public double Resolution { get; set; }
+        public string VerticalDatum { get; set; }
     }
 }

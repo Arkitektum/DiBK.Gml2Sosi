@@ -1,22 +1,48 @@
+using DiBK.Gml2Sosi.Application.Services.Gml2Sosi;
+using DiBK.Gml2Sosi.Application.Services.MultipartRequest;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DiBK.Gml2Sosi.Controllers
+namespace DiBK.Gml2Sosi.Web.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class Gml2SosiController : ControllerBase
+    public class Gml2SosiController : BaseController
     {
-        private readonly ILogger<Gml2SosiController> _logger;
+        private readonly IMultipartRequestService _multipartRequestService;
+        private readonly IGml2SosiService _rpfGml2SosiService;
 
-        public Gml2SosiController(ILogger<Gml2SosiController> logger)
+        public Gml2SosiController(
+            IMultipartRequestService multipartRequestService,
+            IGml2SosiService rpfGml2SosiService,
+            ILogger<Gml2SosiController> logger) : base(logger)
         {
-            _logger = logger;
+            _multipartRequestService = multipartRequestService;
+            _rpfGml2SosiService = rpfGml2SosiService;
         }
 
-        [HttpPost]
-        public IActionResult Convert()
+        [HttpPost("reguleringsplanforslag")]
+        public async Task<IActionResult> ConvertReguleringsplanforslag()
         {
-            return Ok();
+            try
+            {
+                var gmlFile = await _multipartRequestService.GetFileFromMultipart();
+
+                if (gmlFile == null)
+                    return BadRequest();
+
+                var document = await _rpfGml2SosiService.Gml2Sosi(gmlFile);
+
+                return File(document, "text/vnd.sosi", $"{Path.ChangeExtension(gmlFile.FileName, "sos")}");
+            }
+            catch (Exception exception)
+            {
+                var result = HandleException(exception);
+
+                if (result != null)
+                    return result;
+
+                throw;
+            }
         }
     }
 }
