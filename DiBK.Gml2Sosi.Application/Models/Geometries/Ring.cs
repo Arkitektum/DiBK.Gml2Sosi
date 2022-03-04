@@ -17,5 +17,13 @@ namespace DiBK.Gml2Sosi.Application.Models.Geometries
         {
             Segments = segments;
         }
+
+        public string ToWkt()
+        {
+            var compoundCurve = "COMPOUNDCURVE ({0})";
+            var segments = string.Join(", ", Segments.Select(segment => segment.ToWkt()));
+            
+            return string.Format(compoundCurve, segments);
+        }
     }
 }

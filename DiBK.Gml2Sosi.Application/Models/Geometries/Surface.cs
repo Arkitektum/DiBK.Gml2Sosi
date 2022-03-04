@@ -8,20 +8,12 @@
         public string ToWkt()
         {
             var curvePolygon = "CURVEPOLYGON ({0})";
-            var compoundCurve = "COMPOUNDCURVE ({0})";
-
-            var extSegments = string.Join(", ", Exterior.Segments.Select(segment => segment.ToWkt()));
-            var extWkt = string.Format(compoundCurve, extSegments);
 
             var wkts = Interior
-                .Select(interior =>
-                {
-                    var intSegments = string.Join(", ", interior.Segments.Select(segment => segment.ToWkt()));
-                    return $"({string.Format(compoundCurve, intSegments)}";
-                })
+                .Select(interior => $"({interior.ToWkt()})")
                 .ToList();
 
-            wkts.Insert(0, extWkt);
+            wkts.Insert(0, Exterior.ToWkt());
 
             return string.Format(curvePolygon, string.Join(", ", wkts));
         }
