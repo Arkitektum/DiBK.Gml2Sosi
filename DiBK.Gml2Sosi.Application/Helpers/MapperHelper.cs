@@ -13,10 +13,7 @@ namespace DiBK.Gml2Sosi.Application.Helpers
         {
             var featureMemberAttribute = typeof(TSosiModel).GetCustomAttribute<FeatureMemberAttribute>();
 
-            if (featureMemberAttribute == null)
-                throw new Exception();
-
-            return featureMemberAttribute.FeatureMember;
+            return featureMemberAttribute?.FeatureMember;
         }
 
         public static string FormatText(XElement element)

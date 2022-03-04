@@ -1,11 +1,13 @@
 ﻿using DiBK.Gml2Sosi.Application.Attributes;
 using System.Reflection;
+using System.Text;
 
 namespace DiBK.Gml2Sosi.Application.Models.SosiObjects
 {
     public abstract class SosiElement
     {
         public virtual string ElementName { get; }
+        public int SequenceNumber { get; set; }
         public List<string> SosiValues { get; } = new();
 
         public virtual void WriteToStream(StreamWriter streamWriter)
@@ -39,6 +41,22 @@ namespace DiBK.Gml2Sosi.Application.Models.SosiObjects
                     SetSosiValues(value);
                 }
             }
+        }
+
+        public static MemoryStream WriteAllToStream(List<SosiElement> sosiElements)
+        {
+            var memoryStream = new MemoryStream();
+            var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8);
+            var orderedElements = sosiElements.OrderBy(sosiElement => sosiElement.SequenceNumber);
+
+            foreach (var element in sosiElements)
+                element.WriteToStream(streamWriter);
+
+            streamWriter.WriteLine(".SLUTT");
+            streamWriter.Flush();
+            memoryStream.Position = 0;
+
+            return memoryStream;
         }
     }
 }

@@ -7,5 +7,6 @@
         public string ObjectCatalog { get; set; }
         public double Resolution { get; set; }
         public string VerticalDatum { get; set; }
+        public Dictionary<string, string> CoordinateSystems { get; set; }
     }
 }

@@ -6,7 +6,7 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Models.SosiObjects
     public class RpSikringSone : RpHensynSone
     {
         public override string ObjType { get; } = "RpSikringSone";
-        [SosiProperty("..SIKRING", 9)]
+        [SosiProperty("..RPSIKRING", 9)]
         public string Sikring { get; set; }
     }
 }

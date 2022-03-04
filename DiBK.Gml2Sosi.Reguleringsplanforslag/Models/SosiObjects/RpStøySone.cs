@@ -6,7 +6,7 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Models.SosiObjects
     public class RpStøySone : RpHensynSone
     {
         public override string ObjType { get; } = "RpStøySone";
-        [SosiProperty("..STØY", 9)]
+        [SosiProperty("..RPSTØY", 9)]
         public string Støy { get; set; }
     }
 }

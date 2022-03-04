@@ -2,7 +2,9 @@
 using DiBK.Gml2Sosi.Application.Mappers;
 using DiBK.Gml2Sosi.Application.Mappers.Interfaces;
 using DiBK.Gml2Sosi.Application.Models;
+using DiBK.Gml2Sosi.Application.Models.Config;
 using DiBK.Gml2Sosi.Application.Models.SosiObjects;
+using DiBK.Gml2Sosi.Reguleringsplanforslag.Constants;
 using DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers.Interfaces;
 using DiBK.Gml2Sosi.Reguleringsplanforslag.Models.SosiObjects;
 using System.Xml.Linq;
@@ -11,16 +13,19 @@ using Wmhelp.XPath2;
 namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
 {
     public class RpHandlingOmrådeMapper : SosiCurveObjectMapper, IRpHandlingOmrådeMapper
-    {
+    {     
         private readonly ISosiMapper<NasjonalArealplanId> _nasjonalArealplanIdMapper;
+        private readonly DatasetSettings _settings;
         private const string FeatureMemberName = "RpHandlingOmråde";
         private const string KodeByggeGrense = "1211";
 
         public RpHandlingOmrådeMapper(
             ISosiObjectTypeMapper sosiObjectTypeMapper,
-            ISosiMapper<NasjonalArealplanId> nasjonalArealplanIdMapper) : base(sosiObjectTypeMapper)
+            ISosiMapper<NasjonalArealplanId> nasjonalArealplanIdMapper,
+            Datasets datasets) : base(sosiObjectTypeMapper)
         {
             _nasjonalArealplanIdMapper = nasjonalArealplanIdMapper;
+            _settings = datasets.GetSettings(Dataset.Reguleringsplanforslag);
         }
 
         public void Map(GmlDocument document, ref int sequenceNumber, List<SosiElement> sosiObjects)
@@ -44,7 +49,7 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
 
         private RpJuridiskLinje Map(XElement featureElement, XElement geomElement, GmlDocument document, ref int sequenceNumber)
         {
-            var rpJuridiskLinje = MapCurveObject<RpJuridiskLinje>(featureElement, geomElement, document, ref sequenceNumber);
+            var rpJuridiskLinje = MapCurveObject<RpJuridiskLinje>(featureElement, geomElement, document, _settings.Resolution, ref sequenceNumber);
             var rpOmrådeElement = GetRpOmrådeElement(featureElement, document);
 
             rpJuridiskLinje.NasjonalArealplanId = _nasjonalArealplanIdMapper.Map(featureElement, document);

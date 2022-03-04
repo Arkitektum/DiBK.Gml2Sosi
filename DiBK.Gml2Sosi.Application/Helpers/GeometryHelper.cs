@@ -142,5 +142,17 @@ namespace DiBK.Gml2Sosi.Application.Helpers
                 return null;
             }
         }
+
+        public static OgrGeometry OgrGeometryFromWkt(string wkt)
+        {
+            try
+            {
+                return OgrGeometry.CreateFromWkt(wkt);
+            }
+            catch
+            {
+                return null;
+            }
+        }
     }
 }

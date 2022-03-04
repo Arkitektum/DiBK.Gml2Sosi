@@ -22,6 +22,9 @@ namespace DiBK.Gml2Sosi.Application.Models
 
         public List<XElement> GetFeatureElements(params string[] featureNames)
         {
+            if (featureNames == null)
+                return new();
+
             if (!featureNames.Any())
                 return _featureElements.SelectMany(element => element).ToList();
 
@@ -93,7 +96,7 @@ namespace DiBK.Gml2Sosi.Application.Models
 
             _geometryElements = _gmlElements
                 .SelectMany(element => element)
-                .Where(element => GmlHelper.GeometryElementNames.Contains(element.Name.LocalName))
+                .Where(element => GmlGeometry.ElementNames.Contains(element.Name.LocalName))
                 .ToLookup(element => element.Name.LocalName);
         }
 

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace DiBK.Gml2Sosi.Web.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("/")]
     public class Gml2SosiController : BaseController
     {
         private readonly IMultipartRequestService _multipartRequestService;

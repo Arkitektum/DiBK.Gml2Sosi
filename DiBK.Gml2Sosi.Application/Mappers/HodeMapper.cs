@@ -1,5 +1,6 @@
 ﻿using DiBK.Gml2Sosi.Application.Helpers;
 using DiBK.Gml2Sosi.Application.Mappers.Interfaces;
+using DiBK.Gml2Sosi.Application.Models;
 using DiBK.Gml2Sosi.Application.Models.Config;
 using DiBK.Gml2Sosi.Application.Models.SosiObjects;
 using System.Xml.Linq;
@@ -9,26 +10,27 @@ namespace DiBK.Gml2Sosi.Application.Mappers
 {
     public class HodeMapper : IHodeMapper
     {
-        public void Map(
-            XDocument document, DatasetSettings datasetSettings, List<SosiElement> sosiElements)
+        public void Map(GmlDocument document, DatasetSettings settings, List<SosiElement> sosiElements)
         {
-            var srsNameElement = document.Root.Descendants()
+            var rootElement = document.Document.Root;
+            var srsNameElement = rootElement.Descendants()
                 .FirstOrDefault(element => element.Attribute("srsName") != null);
 
-            var envelopeElement = document.Root.XPath2SelectElement("*:boundedBy/*:Envelope");
+            var envelopeElement = rootElement.XPath2SelectElement("*:boundedBy/*:Envelope");
             var lowerCornerElement = envelopeElement?.XPath2SelectElement("*:lowerCorner");
             var upperCornerElement = envelopeElement?.XPath2SelectElement("*:upperCorner");
 
             var hode = new Hode
             {
-                SosiVersjon = datasetSettings.SosiVersion,
-                SosiNivå = datasetSettings.SosiLevel,
-                Objektkatalog = datasetSettings.ObjectCatalog,
+                SequenceNumber = 0,
+                SosiVersjon = settings.SosiVersion,
+                SosiNivå = settings.SosiLevel,
+                Objektkatalog = settings.ObjectCatalog,
                 Transpar = new()
                 {
-                    Enhet = datasetSettings.Resolution.ToString(),
-                    VertikaltDatum = datasetSettings.VerticalDatum,
-                    Koordinatsystem = GmlHelper.GetCoordinateSystem(srsNameElement?.Attribute("srsName").Value)
+                    Enhet = settings.Resolution.ToString(),
+                    VertikaltDatum = settings.VerticalDatum,
+                    Koordinatsystem = GmlHelper.GetCoordinateSystem(srsNameElement?.Attribute("srsName").Value, settings.CoordinateSystems)
                 },
                 Område = new()
                 {

@@ -6,7 +6,7 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Models.SosiObjects
     public class RpFareSone : RpHensynSone
     {
         public override string ObjType { get; } = "RpFareSone";
-        [SosiProperty("..FARE", 9)]
+        [SosiProperty("..RPFARE", 9)]
         public string Fare { get; set; }
     }
 }

@@ -24,5 +24,31 @@
         public const string Surface = "Surface";
         public const string Tin = "Tin";
         public const string TriangulatedSurface = "TriangulatedSurface";
+
+        public static readonly string[] ElementNames = new[]
+        {
+            CompositeCurve,
+            CompositeSolid,
+            CompositeSurface,
+            Curve,
+            GeometricComplex,
+            Grid,
+            LineString,
+            MultiCurve,
+            MultiGeometry,
+            MultiPoint,
+            MultiSolid,
+            MultiSurface,
+            OrientableCurve,
+            OrientableSurface,
+            Point,
+            Polygon,
+            PolyhedralSurface,
+            RectifiedGrid,
+            Solid,
+            Surface,
+            Tin,
+            TriangulatedSurface
+        };
     }
 }

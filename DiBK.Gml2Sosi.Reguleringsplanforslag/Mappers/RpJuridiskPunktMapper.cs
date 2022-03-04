@@ -4,8 +4,8 @@ using DiBK.Gml2Sosi.Application.Models;
 using DiBK.Gml2Sosi.Application.Models.Config;
 using DiBK.Gml2Sosi.Application.Models.Geometries;
 using DiBK.Gml2Sosi.Application.Models.SosiObjects;
+using DiBK.Gml2Sosi.Reguleringsplanforslag.Constants;
 using DiBK.Gml2Sosi.Reguleringsplanforslag.Models.SosiObjects;
-using Microsoft.Extensions.Options;
 using System.Xml.Linq;
 using Wmhelp.XPath2;
 using static DiBK.Gml2Sosi.Reguleringsplanforslag.Helpers.MapperHelper;
@@ -21,11 +21,11 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
         public RpJuridiskPunktMapper(
             ISosiObjectTypeMapper sosiObjectTypeMapper,
             ISosiMapper<NasjonalArealplanId> nasjonalArealplanIdMapper,
-            IOptions<DatasetConfiguration> options)
+            Datasets datasets)
         {
             _sosiObjectTypeMapper = sosiObjectTypeMapper;
             _nasjonalArealplanIdMapper = nasjonalArealplanIdMapper;
-            _settings = options.Value.Reguleringsplanforslag;
+            _settings = datasets.GetSettings(Dataset.Reguleringsplanforslag);
         }
 
         public RpJuridiskPunkt Map(XElement featureElement, GmlDocument document, ref int sequenceNumber)

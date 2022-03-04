@@ -64,5 +64,17 @@ namespace DiBK.Gml2Sosi.Application.Models.SosiObjects
 
             Representasjonspunkt = SosiPoint.Create(point.GetX(0), point.GetY(0), resolution);
         }
+
+        public void SetPointOnSurface(Surface surface)
+        {
+            using var surfaceGeometry = GeometryHelper.OgrGeometryFromWkt(surface.ToWkt());
+
+            if (surfaceGeometry == null)
+                return;
+
+            using var point = surfaceGeometry.PointOnSurface();
+
+            Representasjonspunkt = SosiPoint.Create(point.GetX(0), point.GetY(0), 1);
+        }
     }
 }

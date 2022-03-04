@@ -41,8 +41,7 @@ services.AddTransient<IMultipartRequestService, MultipartRequestService>();
 
 services.AddApplicationServices();
 services.AddApplicationServicesForReguleringsplanforslag();
-
-services.Configure<DatasetConfiguration>(configuration.GetSection(DatasetConfiguration.SectionName));
+services.ConfigureDatasets(configuration);
 
 var cultureInfo = new CultureInfo("en-US");
 CultureInfo.DefaultThreadCurrentCulture = cultureInfo;

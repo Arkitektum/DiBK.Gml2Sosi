@@ -92,7 +92,7 @@ namespace DiBK.Gml2Sosi.Application.Helpers
                 surfaces = ConvertRingsToSurfaces(rings);
             }
 
-            FixRingOrientation(surfaces);
+            //FixRingOrientation(surfaces);
 
             return surfaces;
         }

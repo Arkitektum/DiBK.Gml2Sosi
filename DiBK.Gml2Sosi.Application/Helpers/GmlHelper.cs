@@ -8,33 +8,7 @@ namespace DiBK.Gml2Sosi.Application.Helpers
     public class GmlHelper
     {
         private static readonly Regex _srsNameRegex =
-            new(@"^(http:\/\/www\.opengis\.net\/def\/crs\/EPSG\/0\/|^urn:ogc:def:crs:EPSG::)(?<epsg>\d+)$", RegexOptions.Compiled);
-
-        public static readonly string[] GeometryElementNames = new[]
-        {
-            GmlGeometry.CompositeCurve,
-            GmlGeometry.CompositeSolid,
-            GmlGeometry.CompositeSurface,
-            GmlGeometry.Curve,
-            GmlGeometry.GeometricComplex,
-            GmlGeometry.Grid,
-            GmlGeometry.LineString,
-            GmlGeometry.MultiCurve,
-            GmlGeometry.MultiGeometry,
-            GmlGeometry.MultiPoint,
-            GmlGeometry.MultiSolid,
-            GmlGeometry.MultiSurface,
-            GmlGeometry.OrientableCurve,
-            GmlGeometry.OrientableSurface,
-            GmlGeometry.Point,
-            GmlGeometry.Polygon,
-            GmlGeometry.PolyhedralSurface,
-            GmlGeometry.RectifiedGrid,
-            GmlGeometry.Solid,
-            GmlGeometry.Surface,
-            GmlGeometry.Tin,
-            GmlGeometry.TriangulatedSurface
-        };
+            new(@"^(http:\/\/www\.opengis\.net\/def\/crs\/EPSG\/0\/|urn:ogc:def:crs:EPSG::)(?<epsg>\d+)$", RegexOptions.Compiled);
 
         public static string GetFeatureType(XElement element)
         {
@@ -56,7 +30,7 @@ namespace DiBK.Gml2Sosi.Application.Helpers
         public static IEnumerable<XElement> GetFeatureGeometryElements(XElement featureElement)
         {
             return featureElement.Descendants()
-                .Where(element => GeometryElementNames.Contains(element.Name.LocalName) &&
+                .Where(element => GmlGeometry.ElementNames.Contains(element.Name.LocalName) &&
                     element.Parent.Name.Namespace != element.Parent.GetNamespaceOfPrefix("gml"));
         }
 
@@ -94,7 +68,7 @@ namespace DiBK.Gml2Sosi.Application.Helpers
             return new XLink(fileName, gmlId);
         }
 
-        public static string GetCoordinateSystem(string srsName)
+        public static string GetCoordinateSystem(string srsName, Dictionary<string, string> coordinateSystems)
         {
             if (string.IsNullOrWhiteSpace(srsName))
                 return string.Empty;
@@ -106,8 +80,7 @@ namespace DiBK.Gml2Sosi.Application.Helpers
 
             var epsg = match.Groups["epsg"].Value;
 
-            //return CoordinateSystems.TryGetValue(epsg, out var coordinateSystem) ? coordinateSystem : string.Empty;
-            return null;
+            return coordinateSystems.TryGetValue(epsg, out var coordinateSystem) ? coordinateSystem : string.Empty;
         }
     }
 }

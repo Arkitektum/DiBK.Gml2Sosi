@@ -5,6 +5,6 @@ namespace DiBK.Gml2Sosi.Application.Mappers.Interfaces
 {
     public interface ISosiMapper<TSosiModel>
     {
-        TSosiModel Map(XElement element, GmlDocument document);
+        TSosiModel Map(XElement featureElement, GmlDocument document);
     }
 }
