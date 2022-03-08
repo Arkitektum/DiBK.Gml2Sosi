@@ -187,6 +187,8 @@ namespace DiBK.Gml2Sosi.Application.Mappers
 
             var s1 = DateTime.Now;
 
+            var sGa = DateTime.Now;
+
             foreach (var grouping in result.GroupedArcs)
             {
                 var firstArc = grouping.First();
@@ -203,6 +205,10 @@ namespace DiBK.Gml2Sosi.Application.Mappers
                 }
             }
 
+            _logger.LogInformation("GroupedArcs: {timeUsed}", DateTime.Now.Subtract(sGa).TotalSeconds);
+
+            var sGd = DateTime.Now;
+
             foreach (var grouping in result.GroupedDifferences)
             {
                 var firstDifference = grouping.First();
@@ -218,6 +224,10 @@ namespace DiBK.Gml2Sosi.Application.Mappers
                         curveObjects[localId].Add(curveObject);
                 }
             }
+
+            _logger.LogInformation("GroupedDifferences: {timeUsed}", DateTime.Now.Subtract(sGd).TotalSeconds);
+
+            var sGi = DateTime.Now;
 
             foreach (var grouping in result.GroupedIntersections)
             {
@@ -238,6 +248,10 @@ namespace DiBK.Gml2Sosi.Application.Mappers
                         curveObjects[localId].Add(curveObject);
                 }
             }
+
+            _logger.LogInformation("GroupedIntersections: {timeUsed}", DateTime.Now.Subtract(sGi).TotalSeconds);
+            
+            var sSrf = DateTime.Now;
 
             foreach (var (localId, featureElement) in result.FeatureElements)
             {
@@ -263,6 +277,8 @@ namespace DiBK.Gml2Sosi.Application.Mappers
 
                 surfaceObjects.Add(surfaceObject);
             }
+
+            _logger.LogInformation("Surfaces: {timeUsed}", DateTime.Now.Subtract(sSrf).TotalSeconds);
 
             var distinctCurveObjects = curveObjects
                 .SelectMany(curveObject => curveObject.Value)
