@@ -71,6 +71,9 @@ namespace DiBK.Gml2Sosi.Application.Helpers
         public static void LogInformation<TSosiModel>(int elementCount, DateTime start)
             where TSosiModel : SosiElement
         {
+            if (elementCount == 0)
+                return;
+
             var timeUsed = Math.Round(DateTime.Now.Subtract(start).TotalSeconds, 5);
 
             Log.Information("{featureName}: Genererte {elementCount} elementer på {timeUsed} sek.", typeof(TSosiModel).Name, elementCount, timeUsed);

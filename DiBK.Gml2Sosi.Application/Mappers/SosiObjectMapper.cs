@@ -177,10 +177,15 @@ namespace DiBK.Gml2Sosi.Application.Mappers
             where TSosiSurfaceModel : SosiSurfaceObject
             where TSosiCurveModel : SosiCurveObject, new()
         {
+            var s = DateTime.Now;
             var result = CreateBoundariesFromSurfaces<TSosiSurfaceModel>(document);
+            _logger.LogInformation("CreateBoundariesFromSurfaces: {timeUsed}", DateTime.Now.Subtract(s).TotalSeconds);
+
             var curveObjects = new Dictionary<string, List<TSosiCurveModel>>();
             var surfaceObjects = new List<TSosiSurfaceModel>();
             var surfaceMapper = _serviceProvider.GetRequiredService<ISosiElementMapper<TSosiSurfaceModel>>();
+
+            var s1 = DateTime.Now;
 
             foreach (var grouping in result.GroupedArcs)
             {
@@ -264,6 +269,8 @@ namespace DiBK.Gml2Sosi.Application.Mappers
                 .DistinctBy(curveObject => curveObject.SequenceNumber);
 
             SosiCurveObject.AddNodesToCurves(distinctCurveObjects);
+
+            _logger.LogInformation("Rest: {timeUsed}", DateTime.Now.Subtract(s1).TotalSeconds);
 
             sosiElements.AddRange(distinctCurveObjects);
             sosiElements.AddRange(surfaceObjects);
