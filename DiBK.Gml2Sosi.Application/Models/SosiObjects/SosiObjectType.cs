@@ -20,14 +20,14 @@ namespace DiBK.Gml2Sosi.Application.Models.SosiObjects
         public override string ElementName => $"{ElementType.GetSosiName()} {SequenceNumber}";
         public List<SosiPoint> Points { get; set; }
 
-        public override void WriteToStream(StreamWriter streamWriter)
+        public override async Task WriteToStreamAsync(StreamWriter streamWriter)
         {
             SetSosiValues();
 
-            streamWriter.WriteLine(ElementName + ":");
+            await streamWriter.WriteLineAsync(ElementName + ":");
 
             foreach (var value in SosiValues)
-                streamWriter.WriteLine(value);
+                await streamWriter.WriteLineAsync(value);
         }
     }
 }

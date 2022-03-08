@@ -24,7 +24,7 @@ namespace DiBK.Gml2Sosi.Application.Models.SosiObjects
         public void SetReferences(IEnumerable<SosiCurveObject> boundaryObjects)
         {
             var segments = boundaryObjects.Select(boundaryObject => new SosiSegment(boundaryObject));
-            var surface = SurfaceHelper.SegmentsToSurfaces(segments).FirstOrDefault();
+            var surface = GeometryHelper.SegmentsToSurfaces(segments).FirstOrDefault();
 
             SetReferences(surface);
         }

@@ -9,6 +9,7 @@ using DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers.Interfaces;
 using DiBK.Gml2Sosi.Reguleringsplanforslag.Models.SosiObjects;
 using System.Xml.Linq;
 using Wmhelp.XPath2;
+using static DiBK.Gml2Sosi.Application.Helpers.MapperHelper;
 
 namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
 {
@@ -28,23 +29,28 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
             _settings = datasets.GetSettings(Dataset.Reguleringsplanforslag);
         }
 
-        public void Map(GmlDocument document, ref int sequenceNumber, List<SosiElement> sosiObjects)
+        public void Map(GmlDocument document, ref int sequenceNumber, List<SosiElement> sosiElements)
         {
+            var start = DateTime.Now;
             var featureElements = document.GetFeatureElements(FeatureMemberName);
+            var elementCount = 0;
 
             foreach (var featureElement in featureElements)
             {
                 var geomElement = GmlHelper.GetFeatureGeometryElements(featureElement).FirstOrDefault();
-                var segmentElements = SurfaceHelper.GetSegmentElementsOfSurfaceElement(geomElement);
+                var segmentElements = GeometryHelper.GetSegmentElementsOfSurfaceElement(geomElement);
                 var curveObjects = new List<SosiCurveObject>();
 
                 foreach (var segmentElement in segmentElements)
                     curveObjects.Add(Map(featureElement, segmentElement, document, ref sequenceNumber));
 
                 SosiCurveObject.AddNodesToCurves(curveObjects);
+                elementCount += curveObjects.Count;
 
-                sosiObjects.AddRange(curveObjects);
+                sosiElements.AddRange(curveObjects);
             }
+
+            LogInformation<RpJuridiskLinje>(elementCount, start);
         }
 
         private RpJuridiskLinje Map(XElement featureElement, XElement geomElement, GmlDocument document, ref int sequenceNumber)

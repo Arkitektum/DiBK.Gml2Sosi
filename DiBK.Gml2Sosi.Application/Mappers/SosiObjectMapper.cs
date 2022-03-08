@@ -5,6 +5,7 @@ using DiBK.Gml2Sosi.Application.Models.Geometries;
 using DiBK.Gml2Sosi.Application.Models.SosiObjects;
 using DiBK.Gml2Sosi.Application.Utils;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Operation.Linemerge;
 using System.Xml.Linq;
@@ -16,29 +17,36 @@ namespace DiBK.Gml2Sosi.Application.Mappers
     public class SosiObjectMapper : SosiCurveObjectMapper, ISosiObjectMapper
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly ILogger<SosiObjectMapper> _logger;
 
         public SosiObjectMapper(
             IServiceProvider serviceProvider,
-            ISosiObjectTypeMapper sosiObjectTypeMapper) : base(sosiObjectTypeMapper)
+            ISosiObjectTypeMapper sosiObjectTypeMapper,
+            ILogger<SosiObjectMapper> logger) : base(sosiObjectTypeMapper)
         {
             _serviceProvider = serviceProvider;
+            _logger = logger;
         }
 
         public void MapSosiObjects<TSosiModel>(GmlDocument document, ref int sequenceNumber, List<SosiElement> sosiElements)
             where TSosiModel : SosiElement, new()
         {
+            var start = DateTime.Now;
             var featureMemberName = GetFeatureMemberName<TSosiModel>();
             var sosiMapper = _serviceProvider.GetRequiredService<ISosiElementMapper<TSosiModel>>();
             var featureElements = document.GetFeatureElements(featureMemberName);
 
             foreach (var featureElement in featureElements)
                 sosiElements.Add(sosiMapper.Map(featureElement, document, ref sequenceNumber));
+
+            LogInformation<TSosiModel>(featureElements.Count, start);
         }
 
         public void MapSosiCurveObjects<TSosiCurveModel>(
             GmlDocument document, bool addNodes, ref int sequenceNumber, List<SosiElement> sosiElements)
             where TSosiCurveModel : SosiCurveObject, new()
         {
+            var start = DateTime.Now;
             var featureMemberName = GetFeatureMemberName<TSosiCurveModel>();
             var curveObjects = new List<SosiCurveObject>();
             var curveMapper = _serviceProvider.GetRequiredService<ISosiCurveObjectMapper<TSosiCurveModel>>();
@@ -71,6 +79,8 @@ namespace DiBK.Gml2Sosi.Application.Mappers
                 SosiCurveObject.AddNodesToCurves(curveObjects);
 
             sosiElements.AddRange(curveObjects);
+
+            LogInformation<TSosiCurveModel>(curveFeatureElements.Count, start);
         }
 
         public void MapSosiSurfaceAndCurveObjects<TSosiSurfaceModel, TSosiCurveModel>(
@@ -78,20 +88,22 @@ namespace DiBK.Gml2Sosi.Application.Mappers
             where TSosiSurfaceModel : SosiSurfaceObject
             where TSosiCurveModel : SosiCurveObject, new()
         {
+            var start = DateTime.Now;
             var curveFeatureMemberName = GetFeatureMemberName<TSosiCurveModel>();
             var curveFeatureElements = document.GetFeatureElements(curveFeatureMemberName);
 
             if (curveFeatureElements.Any())
-                MapSosiSurfaceAndCurveObjectsFromAssociations<TSosiSurfaceModel, TSosiCurveModel>(curveFeatureElements, document, resolution, ref sequenceNumber, sosiElements);
+                MapSosiSurfaceAndCurveObjectsFromAssociations<TSosiSurfaceModel, TSosiCurveModel>(curveFeatureElements, document, resolution, ref sequenceNumber, sosiElements, start);
             else
-                MapSosiSurfaceAndCurveObjectsFromSurfaces<TSosiSurfaceModel, TSosiCurveModel>(document, resolution, ref sequenceNumber, sosiElements);
+                MapSosiSurfaceAndCurveObjectsFromSurfaces<TSosiSurfaceModel, TSosiCurveModel>(document, resolution, ref sequenceNumber, sosiElements, start);
         }
 
         private void MapSosiSurfaceAndCurveObjectsFromAssociations<TSosiSurfaceModel, TSosiCurveModel>(
-            List<XElement> featureElements, GmlDocument document, double resolution, ref int sequenceNumber, List<SosiElement> sosiElements)
+            List<XElement> featureElements, GmlDocument document, double resolution, ref int sequenceNumber, List<SosiElement> sosiElements, DateTime start)
             where TSosiSurfaceModel : SosiSurfaceObject
             where TSosiCurveModel : SosiCurveObject, new()
         {
+
             var surfaceMapper = _serviceProvider.GetRequiredService<ISosiElementMapper<TSosiSurfaceModel>>();
             var curveObjectsDict = CreateCurveObjects<TSosiCurveModel>(featureElements, document, resolution, ref sequenceNumber);
             var surfaceObjects = new List<TSosiSurfaceModel>();
@@ -129,15 +141,15 @@ namespace DiBK.Gml2Sosi.Application.Mappers
                     var referencedElement = document.GetElementByGmlId(xLink.GmlId);
                     var localId = GetLocalId(referencedElement);
 
-                    if (!curveObjectsDict.TryGetValue(localId, out var curveObjects))
+                    if (!curveObjectsDict.TryGetValue(localId, out var crvObjects))
                         continue;
 
-                    var curveObject = curveObjects.SingleOrDefault(crvObject => crvObject.Ident.LokalId == localId);
+                    var curveObject = crvObjects.SingleOrDefault(crvObject => crvObject.Ident.LokalId == localId);
 
                     segments.Add(new SosiSegment(curveObject.Points, curveObject.SequenceNumber, curveObject.Segment.SegmentType));
                 }
 
-                var surfaces = SurfaceHelper.SegmentsToSurfaces(segments);
+                var surfaces = GeometryHelper.SegmentsToSurfaces(segments);
 
                 for (var i = 0; i < surfaceObjs.Count; i++)
                 {
@@ -151,12 +163,17 @@ namespace DiBK.Gml2Sosi.Application.Mappers
                 }
             }
 
-            sosiElements.AddRange(curveObjectsDict.SelectMany(kvp => kvp.Value));
+            var curveObjects = curveObjectsDict.SelectMany(kvp => kvp.Value);
+
+            sosiElements.AddRange(curveObjects);
             sosiElements.AddRange(surfaceObjects);
+
+            LogInformation<TSosiCurveModel>(curveObjects.Count(), start);
+            LogInformation<TSosiSurfaceModel>(surfaceObjects.Count, start);
         }
 
         private void MapSosiSurfaceAndCurveObjectsFromSurfaces<TSosiSurfaceModel, TSosiCurveModel>(
-            GmlDocument document, double resolution, ref int sequenceNumber, List<SosiElement> sosiElements)
+            GmlDocument document, double resolution, ref int sequenceNumber, List<SosiElement> sosiElements, DateTime start)
             where TSosiSurfaceModel : SosiSurfaceObject
             where TSosiCurveModel : SosiCurveObject, new()
         {
@@ -233,7 +250,7 @@ namespace DiBK.Gml2Sosi.Application.Mappers
                         return clone;
                     });
 
-                var surfaces = SurfaceHelper.SegmentsToSurfaces(clonedSegments);
+                var surfaces = GeometryHelper.SegmentsToSurfaces(clonedSegments);
                 var firstSurface = surfaces.FirstOrDefault();
 
                 surfaceObject.SetReferences(firstSurface);
@@ -250,6 +267,9 @@ namespace DiBK.Gml2Sosi.Application.Mappers
 
             sosiElements.AddRange(distinctCurveObjects);
             sosiElements.AddRange(surfaceObjects);
+
+            LogInformation<TSosiCurveModel>(distinctCurveObjects.Count(), start);
+            LogInformation<TSosiSurfaceModel>(surfaceObjects.Count, start);
         }
 
         private Dictionary<string, List<TSosiCurveModel>> CreateCurveObjects<TSosiCurveModel>(
@@ -327,7 +347,7 @@ namespace DiBK.Gml2Sosi.Application.Mappers
                 }
             }
 
-            AddIntersections(lineStringSegments);
+            FindIntersections(lineStringSegments);
 
             var groupedArcs = arcs
                 .GroupBy(arc => arc.LineString, new CustomLineStringComparer());
@@ -348,7 +368,7 @@ namespace DiBK.Gml2Sosi.Application.Mappers
             };
         }
 
-        private static void AddIntersections(List<LineStringSegment> lineStringSegments)
+        private static void FindIntersections(List<LineStringSegment> lineStringSegments)
         {
             for (int i = 0; i < lineStringSegments.Count; i++)
             {

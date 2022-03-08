@@ -10,8 +10,9 @@ namespace DiBK.Gml2Sosi.Application.Models.SosiObjects
         public int SequenceNumber { get; set; }
         public List<string> SosiValues { get; } = new();
 
-        public virtual void WriteToStream(StreamWriter streamWriter)
+        public virtual Task WriteToStreamAsync(StreamWriter streamWriter)
         {
+            return Task.CompletedTask;
         }
 
         protected virtual void SetSosiValues()
@@ -43,17 +44,17 @@ namespace DiBK.Gml2Sosi.Application.Models.SosiObjects
             }
         }
 
-        public static MemoryStream WriteAllToStream(List<SosiElement> sosiElements)
+        public static async Task<MemoryStream> WriteAllToStreamAsync(List<SosiElement> sosiElements)
         {
             var memoryStream = new MemoryStream();
             var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8);
             var orderedElements = sosiElements.OrderBy(sosiElement => sosiElement.SequenceNumber);
 
             foreach (var element in sosiElements)
-                element.WriteToStream(streamWriter);
+                await element.WriteToStreamAsync(streamWriter);
 
-            streamWriter.WriteLine(".SLUTT");
-            streamWriter.Flush();
+            await streamWriter.WriteLineAsync(".SLUTT");
+            await streamWriter.FlushAsync();
             memoryStream.Position = 0;
 
             return memoryStream;

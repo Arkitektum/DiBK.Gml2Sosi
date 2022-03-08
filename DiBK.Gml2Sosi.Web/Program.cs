@@ -1,5 +1,4 @@
 using DiBK.Gml2Sosi.Application.Config;
-using DiBK.Gml2Sosi.Application.Models.Config;
 using DiBK.Gml2Sosi.Application.Services.MultipartRequest;
 using DiBK.Gml2Sosi.Reguleringsplanforslag.Config;
 using DiBK.Gml2Sosi.Web.Configuration;
@@ -46,9 +45,6 @@ services.ConfigureDatasets(configuration);
 var cultureInfo = new CultureInfo("en-US");
 CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
 CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
-
-Ogr.RegisterAll();
-Ogr.UseExceptions();
 
 Log.Logger = new LoggerConfiguration()
     .Enrich.FromLogContext()

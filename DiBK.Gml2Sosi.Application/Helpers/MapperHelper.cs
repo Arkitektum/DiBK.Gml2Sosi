@@ -1,6 +1,7 @@
 ﻿using DiBK.Gml2Sosi.Application.Attributes;
 using DiBK.Gml2Sosi.Application.Models.Geometries;
 using DiBK.Gml2Sosi.Application.Models.SosiObjects;
+using Serilog;
 using System.Reflection;
 using System.Xml.Linq;
 using Wmhelp.XPath2;
@@ -65,6 +66,14 @@ namespace DiBK.Gml2Sosi.Application.Helpers
                 CartographicElementType.Kurve => SegmentType.Kurve,
                 _ => SegmentType.Unknown,
             };
+        }
+
+        public static void LogInformation<TSosiModel>(int elementCount, DateTime start)
+            where TSosiModel : SosiElement
+        {
+            var timeUsed = Math.Round(DateTime.Now.Subtract(start).TotalSeconds, 5);
+
+            Log.Information("{featureName}: Genererte {elementCount} elementer på {timeUsed} sek.", typeof(TSosiModel).Name, elementCount, timeUsed);
         }
     }
 }
