@@ -42,7 +42,31 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Services.Gml2Sosi
             var sequenceNumber = 1;
 
             _hodeMapper.Map(document, _settings, sosiElements);
-            _sosiObjectMapper.MapSosiSurfaceAndCurveObjects<RpOmråde, RpGrense>(document, _settings.Resolution, ref sequenceNumber, sosiElements);
+            
+            var tasks = new List<Task>
+            {
+                Task.Run(() => _sosiObjectMapper.MapSosiSurfaceAndCurveObjects<RpOmråde, RpGrense>(document, _settings.Resolution, sosiElements)),
+                Task.Run(() => _sosiObjectMapper.MapSosiSurfaceAndCurveObjects<RpArealformålOmråde, RpFormålGrense>(document, _settings.Resolution, sosiElements)),
+                Task.Run(() => _sosiObjectMapper.MapSosiSurfaceAndCurveObjects<RpBestemmelseOmråde, RpBestemmelseGrense>(document, _settings.Resolution, sosiElements)),
+                Task.Run(() => _sosiObjectMapper.MapSosiSurfaceAndCurveObjects<RpAngittHensynSone, RpAngittHensynGrense>(document, _settings.Resolution, sosiElements)),
+                Task.Run(() => _sosiObjectMapper.MapSosiSurfaceAndCurveObjects<RpBåndleggingSone, RpBåndleggingGrense>(document, _settings.Resolution, sosiElements)),
+                Task.Run(() => _sosiObjectMapper.MapSosiSurfaceAndCurveObjects<RpDetaljeringSone, RpDetaljeringGrense>(document, _settings.Resolution, sosiElements)),
+                Task.Run(() => _sosiObjectMapper.MapSosiSurfaceAndCurveObjects<RpFareSone, RpFareGrense>(document, _settings.Resolution, sosiElements)),
+                Task.Run(() => _sosiObjectMapper.MapSosiSurfaceAndCurveObjects<RpGjennomføringSone, RpGjennomføringGrense>(document, _settings.Resolution, sosiElements)),
+                Task.Run(() => _sosiObjectMapper.MapSosiSurfaceAndCurveObjects<RpInfrastrukturSone, RpInfrastrukturGrense>(document, _settings.Resolution, sosiElements)),
+                Task.Run(() => _sosiObjectMapper.MapSosiSurfaceAndCurveObjects<RpSikringSone, RpSikringGrense>(document, _settings.Resolution, sosiElements)),
+                Task.Run(() => _sosiObjectMapper.MapSosiSurfaceAndCurveObjects<RpStøySone, RpStøyGrense>(document, _settings.Resolution, sosiElements)),
+                Task.Run(() => _sosiObjectMapper.MapSosiSurfaceAndCurveObjects<PblMidlByggAnleggOmråde, PblMidlByggAnleggGrense>(document, _settings.Resolution, sosiElements)),
+                Task.Run(() => _sosiObjectMapper.MapSosiCurveObjects<RpRegulertHøyde>(document, false, sosiElements)),
+                Task.Run(() => _sosiObjectMapper.MapSosiCurveObjects<RpJuridiskLinje>(document, true, sosiElements)),
+                Task.Run(() => _sosiObjectMapper.MapSosiObjects<RpJuridiskPunkt>(document, sosiElements)),
+                Task.Run(() => _sosiObjectMapper.MapSosiObjects<RpPåskrift>(document, sosiElements)),
+                Task.Run(() => _rpHandlingOmrådeMapper.Map(document, sosiElements))
+            };
+
+            await Task.WhenAll(tasks);
+
+            /*_sosiObjectMapper.MapSosiSurfaceAndCurveObjects<RpOmråde, RpGrense>(document, _settings.Resolution, ref sequenceNumber, sosiElements);
             _sosiObjectMapper.MapSosiSurfaceAndCurveObjects<RpArealformålOmråde, RpFormålGrense>(document, resolution, ref sequenceNumber, sosiElements);
             _sosiObjectMapper.MapSosiSurfaceAndCurveObjects<RpBestemmelseOmråde, RpBestemmelseGrense>(document, resolution, ref sequenceNumber, sosiElements);
             _sosiObjectMapper.MapSosiSurfaceAndCurveObjects<RpAngittHensynSone, RpAngittHensynGrense>(document, resolution, ref sequenceNumber, sosiElements);
@@ -57,8 +81,7 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Services.Gml2Sosi
             _sosiObjectMapper.MapSosiCurveObjects<RpRegulertHøyde>(document, false, ref sequenceNumber, sosiElements);
             _sosiObjectMapper.MapSosiCurveObjects<RpJuridiskLinje>(document, true, ref sequenceNumber, sosiElements);
             _sosiObjectMapper.MapSosiObjects<RpJuridiskPunkt>(document, ref sequenceNumber, sosiElements);
-            _sosiObjectMapper.MapSosiObjects<RpPåskrift>(document, ref sequenceNumber, sosiElements);
-            _rpHandlingOmrådeMapper.Map(document, ref sequenceNumber, sosiElements);
+            _sosiObjectMapper.MapSosiObjects<RpPåskrift>(document, ref sequenceNumber, sosiElements);*/
 
             var stream = await SosiElement.WriteAllToStreamAsync(sosiElements);
             var timeUsed = Math.Round(DateTime.Now.Subtract(start).TotalSeconds, 5);

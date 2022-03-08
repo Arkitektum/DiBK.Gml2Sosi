@@ -10,7 +10,7 @@
             var curvePolygon = "CURVEPOLYGON ({0})";
 
             var wkts = Interior
-                .Select(interior => $"({interior.ToWkt()})")
+                .Select(interior => interior.ToWkt())
                 .ToList();
 
             wkts.Insert(0, Exterior.ToWkt());

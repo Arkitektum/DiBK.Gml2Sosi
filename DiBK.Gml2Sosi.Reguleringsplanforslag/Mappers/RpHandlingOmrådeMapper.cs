@@ -29,7 +29,7 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
             _settings = datasets.GetSettings(Dataset.Reguleringsplanforslag);
         }
 
-        public void Map(GmlDocument document, ref int sequenceNumber, List<SosiElement> sosiElements)
+        public void Map(GmlDocument document, List<SosiElement> sosiElements)
         {
             var start = DateTime.Now;
             var featureElements = document.GetFeatureElements(FeatureMemberName);
@@ -42,7 +42,7 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
                 var curveObjects = new List<SosiCurveObject>();
 
                 foreach (var segmentElement in segmentElements)
-                    curveObjects.Add(Map(featureElement, segmentElement, document, ref sequenceNumber));
+                    curveObjects.Add(Map(featureElement, segmentElement, document));
 
                 SosiCurveObject.AddNodesToCurves(curveObjects);
                 elementCount += curveObjects.Count;
@@ -53,9 +53,9 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
             LogInformation<RpJuridiskLinje>(elementCount, start);
         }
 
-        private RpJuridiskLinje Map(XElement featureElement, XElement geomElement, GmlDocument document, ref int sequenceNumber)
+        private RpJuridiskLinje Map(XElement featureElement, XElement geomElement, GmlDocument document)
         {
-            var rpJuridiskLinje = MapCurveObject<RpJuridiskLinje>(featureElement, geomElement, document, _settings.Resolution, ref sequenceNumber);
+            var rpJuridiskLinje = MapCurveObject<RpJuridiskLinje>(featureElement, geomElement, document, _settings.Resolution);
             var rpOmrådeElement = GetRpOmrådeElement(featureElement, document);
 
             rpJuridiskLinje.NasjonalArealplanId = _nasjonalArealplanIdMapper.Map(featureElement, document);

@@ -24,9 +24,9 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
             _settings = datasets.GetSettings(Dataset.Reguleringsplanforslag);
         }
 
-        public RpJuridiskLinje Map(XElement featureElement, XElement geomElement, GmlDocument document, ref int sequenceNumber)
+        public RpJuridiskLinje Map(XElement featureElement, XElement geomElement, GmlDocument document)
         {
-            var rpJuridiskLinje = MapCurveObject<RpJuridiskLinje>(featureElement, geomElement, document, _settings.Resolution, ref sequenceNumber);
+            var rpJuridiskLinje = MapCurveObject<RpJuridiskLinje>(featureElement, geomElement, document, _settings.Resolution);
 
             rpJuridiskLinje.NasjonalArealplanId = _nasjonalArealplanIdMapper.Map(featureElement, document);
             rpJuridiskLinje.JuridiskLinje = featureElement.XPath2SelectElement("*:juridisklinje")?.Value;

@@ -4,6 +4,7 @@ using DiBK.Gml2Sosi.Application.Models;
 using DiBK.Gml2Sosi.Application.Models.SosiObjects;
 using System.Xml.Linq;
 using Wmhelp.XPath2;
+using static DiBK.Gml2Sosi.Application.Helpers.MapperHelper;
 
 namespace DiBK.Gml2Sosi.Application.Mappers
 {
@@ -17,13 +18,14 @@ namespace DiBK.Gml2Sosi.Application.Mappers
             _identMapper = identMapper;
         }
 
-        public TSosiModel Map<TSosiModel>(XElement featureElement, GmlDocument document, ref int sequenceNumber) where TSosiModel : SosiObjectType, new()
+        public TSosiModel Map<TSosiModel>(XElement featureElement, GmlDocument document, ref int sequenceNumber) 
+            where TSosiModel : SosiObjectType, new()
         {
             TSosiModel model = new();
 
-            model.SequenceNumber = sequenceNumber++;
-            model.FørsteDigitaliseringsdato = MapperHelper.FormatDate(featureElement.XPath2SelectElement("*:førsteDigitaliseringsdato"));
-            model.Oppdateringsdato = MapperHelper.FormatDate(featureElement.XPath2SelectElement("*:oppdateringsdato"));
+            //model.SequenceNumber = sequenceNumber++;
+            model.FørsteDigitaliseringsdato = FormatDate(featureElement.XPath2SelectElement("*:førsteDigitaliseringsdato"));
+            model.Oppdateringsdato = FormatDate(featureElement.XPath2SelectElement("*:oppdateringsdato"));
             model.Ident = _identMapper.Map(featureElement, document);
             model.Kvalitet = featureElement.XPath2SelectElement("*:kvalitet//*:målemetode")?.Value;
 
@@ -31,7 +33,26 @@ namespace DiBK.Gml2Sosi.Application.Mappers
 
             model.Ident.LokalId = idElement.XPath2SelectElement("*:lokalId")?.Value;
             model.Ident.Navnerom = idElement.XPath2SelectElement("*:navnerom")?.Value;
-            model.Ident.VersjonId = MapperHelper.FormatText(idElement.XPath2SelectElement("*:versjonId"));
+            model.Ident.VersjonId = FormatText(idElement.XPath2SelectElement("*:versjonId"));
+
+            return model;
+        }
+
+        public TSosiModel Map<TSosiModel>(XElement featureElement, GmlDocument document) 
+            where TSosiModel : SosiObjectType, new()
+        {
+            TSosiModel model = new();
+
+            model.FørsteDigitaliseringsdato = FormatDate(featureElement.XPath2SelectElement("*:førsteDigitaliseringsdato"));
+            model.Oppdateringsdato = FormatDate(featureElement.XPath2SelectElement("*:oppdateringsdato"));
+            model.Ident = _identMapper.Map(featureElement, document);
+            model.Kvalitet = featureElement.XPath2SelectElement("*:kvalitet//*:målemetode")?.Value;
+
+            var idElement = featureElement.XPath2SelectElement("*:identifikasjon/*:Identifikasjon");
+
+            model.Ident.LokalId = idElement.XPath2SelectElement("*:lokalId")?.Value;
+            model.Ident.Navnerom = idElement.XPath2SelectElement("*:navnerom")?.Value;
+            model.Ident.VersjonId = FormatText(idElement.XPath2SelectElement("*:versjonId"));
 
             return model;
         }

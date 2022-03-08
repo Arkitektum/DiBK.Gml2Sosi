@@ -6,6 +6,6 @@ namespace DiBK.Gml2Sosi.Application.Mappers.Interfaces
 {
     public interface ISosiCurveObjectMapper<TSosiCurveModel> where TSosiCurveModel : SosiCurveObject
     {
-        TSosiCurveModel Map(XElement featureElement, XElement geomElement, GmlDocument document, ref int sequenceNumber);
+        TSosiCurveModel Map(XElement featureElement, XElement geomElement, GmlDocument document);
     }
 }

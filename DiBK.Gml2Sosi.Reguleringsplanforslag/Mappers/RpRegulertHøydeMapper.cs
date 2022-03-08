@@ -24,9 +24,9 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
             _settings = datasets.GetSettings(Dataset.Reguleringsplanforslag);
         }
 
-        public RpRegulertHøyde Map(XElement featureElement, XElement geomElement, GmlDocument document, ref int sequenceNumber)
+        public RpRegulertHøyde Map(XElement featureElement, XElement geomElement, GmlDocument document)
         {
-            var rpRegulertHøyde = MapCurveObject<RpRegulertHøyde>(featureElement, geomElement, document, _settings.Resolution, ref sequenceNumber);
+            var rpRegulertHøyde = MapCurveObject<RpRegulertHøyde>(featureElement, geomElement, document, _settings.Resolution);
             var rpOmrådeElement = GetReferencedRpOmrådeElement(featureElement, document);
 
             rpRegulertHøyde.NasjonalArealplanId = _nasjonalArealplanIdMapper.Map(featureElement, document);

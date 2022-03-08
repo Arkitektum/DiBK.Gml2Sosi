@@ -8,22 +8,24 @@ namespace DiBK.Gml2Sosi.Application.Models.Geometries
         public int SequenceNumber { get; set; }
         public List<SosiPoint> Points { get; set; } = new();
         public bool IsReversed { get; set; }
-        public SegmentType SegmentType { get; set; }        
+        public SegmentType SegmentType { get; set; }
+        public SosiCurveObject CurveObject { get; set; }
 
         public SosiSegment()
         {
         }
 
-        public SosiSegment(SosiCurveObject curveObject) : this(curveObject.Points, curveObject.SequenceNumber, MapperHelper.CartographicElementTypeToSegmentType(curveObject.ElementType))
+        public SosiSegment(SosiCurveObject curveObject) : this(curveObject.Points, curveObject.SequenceNumber, MapperHelper.CartographicElementTypeToSegmentType(curveObject.ElementType), curveObject)
         {
         }
 
-        public SosiSegment(List<SosiPoint> points, int sequenceNumber, SegmentType segmentType, bool isReversed = false)
+        public SosiSegment(List<SosiPoint> points, int sequenceNumber, SegmentType segmentType, SosiCurveObject curveObject, bool isReversed = false)
         {
             Points = points;
             SequenceNumber = sequenceNumber;
             SegmentType = segmentType;
             IsReversed = isReversed;
+            CurveObject = curveObject;
         }
 
         public SosiSegment Clone()
@@ -32,6 +34,7 @@ namespace DiBK.Gml2Sosi.Application.Models.Geometries
             {
                 Points = Points.ConvertAll(point => point.Clone()),
                 SequenceNumber = SequenceNumber,
+                CurveObject = CurveObject,
                 SegmentType = SegmentType,
                 IsReversed = IsReversed
             };

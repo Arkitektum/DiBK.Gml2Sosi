@@ -28,6 +28,21 @@ namespace DiBK.Gml2Sosi.Application.Mappers
             _logger = logger;
         }
 
+        public void MapSosiObjects<TSosiModel>(GmlDocument document, List<SosiElement> sosiElements)
+            where TSosiModel : SosiElement, new()
+        {
+            var sn = 0;
+            var start = DateTime.Now;
+            var featureMemberName = GetFeatureMemberName<TSosiModel>();
+            var sosiMapper = _serviceProvider.GetRequiredService<ISosiElementMapper<TSosiModel>>();
+            var featureElements = document.GetFeatureElements(featureMemberName);
+
+            foreach (var featureElement in featureElements)
+                sosiElements.Add(sosiMapper.Map(featureElement, document, ref sn));
+
+            LogInformation<TSosiModel>(featureElements.Count, start);
+        }
+
         public void MapSosiObjects<TSosiModel>(GmlDocument document, ref int sequenceNumber, List<SosiElement> sosiElements)
             where TSosiModel : SosiElement, new()
         {
@@ -40,6 +55,48 @@ namespace DiBK.Gml2Sosi.Application.Mappers
                 sosiElements.Add(sosiMapper.Map(featureElement, document, ref sequenceNumber));
 
             LogInformation<TSosiModel>(featureElements.Count, start);
+        }
+
+        public void MapSosiCurveObjects<TSosiCurveModel>(
+            GmlDocument document, bool addNodes, List<SosiElement> sosiElements)
+            where TSosiCurveModel : SosiCurveObject, new()
+        {
+            var sn = 0;
+            var start = DateTime.Now;
+            var featureMemberName = GetFeatureMemberName<TSosiCurveModel>();
+            var curveObjects = new List<SosiCurveObject>();
+            var curveMapper = _serviceProvider.GetRequiredService<ISosiCurveObjectMapper<TSosiCurveModel>>();
+            var curveFeatureElements = document.GetFeatureElements(featureMemberName);
+
+            foreach (var curveFeatureElement in curveFeatureElements)
+            {
+                var geomElement = GmlHelper.GetFeatureGeometryElements(curveFeatureElement).FirstOrDefault();
+
+                if (geomElement == null)
+                    continue;
+
+                var segmentElements = geomElement.XPath2SelectElements("*:segments/*");
+                var geomCount = segmentElements.Count();
+                var localId = GetLocalId(curveFeatureElement);
+                var index = 0;
+
+                foreach (var segmentElement in segmentElements)
+                {
+                    var curveObject = curveMapper.Map(curveFeatureElement, segmentElement, document);
+
+                    if (geomCount > 1)
+                        curveObject.Ident.LokalId = $"{localId}-{index++}";
+
+                    curveObjects.Add(curveObject);
+                }
+            }
+
+            if (addNodes)
+                SosiCurveObject.AddNodesToCurves(curveObjects);
+
+            sosiElements.AddRange(curveObjects);
+
+            LogInformation<TSosiCurveModel>(curveFeatureElements.Count, start);
         }
 
         public void MapSosiCurveObjects<TSosiCurveModel>(
@@ -66,7 +123,7 @@ namespace DiBK.Gml2Sosi.Application.Mappers
 
                 foreach (var segmentElement in segmentElements)
                 {
-                    var curveObject = curveMapper.Map(curveFeatureElement, segmentElement, document, ref sequenceNumber);
+                    var curveObject = curveMapper.Map(curveFeatureElement, segmentElement, document);
 
                     if (geomCount > 1)
                         curveObject.Ident.LokalId = $"{localId}-{index++}";
@@ -81,6 +138,21 @@ namespace DiBK.Gml2Sosi.Application.Mappers
             sosiElements.AddRange(curveObjects);
 
             LogInformation<TSosiCurveModel>(curveFeatureElements.Count, start);
+        }
+
+        public void MapSosiSurfaceAndCurveObjects<TSosiSurfaceModel, TSosiCurveModel>(
+            GmlDocument document, double resolution, List<SosiElement> sosiElements)
+            where TSosiSurfaceModel : SosiSurfaceObject
+            where TSosiCurveModel : SosiCurveObject, new()
+        {
+            var start = DateTime.Now;
+            var curveFeatureMemberName = GetFeatureMemberName<TSosiCurveModel>();
+            var curveFeatureElements = document.GetFeatureElements(curveFeatureMemberName);
+
+            if (curveFeatureElements.Any())
+                MapSosiSurfaceAndCurveObjectsFromAssociations<TSosiSurfaceModel, TSosiCurveModel>(curveFeatureElements, document, resolution, sosiElements, start);
+            else
+                MapSosiSurfaceAndCurveObjectsFromSurfaces<TSosiSurfaceModel, TSosiCurveModel>(document, resolution, sosiElements, start);
         }
 
         public void MapSosiSurfaceAndCurveObjects<TSosiSurfaceModel, TSosiCurveModel>(
@@ -99,11 +171,84 @@ namespace DiBK.Gml2Sosi.Application.Mappers
         }
 
         private void MapSosiSurfaceAndCurveObjectsFromAssociations<TSosiSurfaceModel, TSosiCurveModel>(
+            List<XElement> featureElements, GmlDocument document, double resolution, List<SosiElement> sosiElements, DateTime start)
+            where TSosiSurfaceModel : SosiSurfaceObject
+            where TSosiCurveModel : SosiCurveObject, new()
+        {
+            var sn = 0;
+            var surfaceMapper = _serviceProvider.GetRequiredService<ISosiElementMapper<TSosiSurfaceModel>>();
+            var curveObjectsDict = CreateCurveObjects<TSosiCurveModel>(featureElements, document, resolution, ref sn);
+            var surfaceObjects = new List<TSosiSurfaceModel>();
+            var surfaceFeatureMemberName = GetFeatureMemberName<TSosiSurfaceModel>();
+            var surfaceFeatureElements = document.GetFeatureElements(surfaceFeatureMemberName);
+
+            foreach (var featureElement in surfaceFeatureElements)
+            {
+                var geomElement = GmlHelper.GetFeatureGeometryElements(featureElement).FirstOrDefault();
+                var surfaceMemberElements = geomElement.XPath2SelectElements("*:surfaceMember/*");
+                var surfaceMemberCount = surfaceMemberElements.Count();
+                var surfaceObjs = new List<TSosiSurfaceModel>();
+                var tempLocalId = GetLocalId(featureElement);
+                var index = 0;
+
+                foreach (var surfaceMemberElement in surfaceMemberElements)
+                {
+                    var localId = surfaceMemberCount == 1 ? tempLocalId : $"{tempLocalId}-{index++}";
+                    var surfaceObject = surfaceMapper.Map(featureElement, document, ref sn);
+                    surfaceObject.Ident.LokalId = localId;
+
+                    surfaceObjs.Add(surfaceObject);
+                }
+
+                var xLinkElement = featureElement.XPath2SelectElements("*:avgrensesAv");
+
+                if (!xLinkElement.Any())
+                    continue;
+
+                var segments = new List<SosiSegment>();
+
+                foreach (var boundaryElement in xLinkElement)
+                {
+                    var xLink = GmlHelper.GetXLink(boundaryElement);
+                    var referencedElement = document.GetElementByGmlId(xLink.GmlId);
+                    var localId = GetLocalId(referencedElement);
+
+                    if (!curveObjectsDict.TryGetValue(localId, out var crvObjects))
+                        continue;
+
+                    var curveObject = crvObjects.SingleOrDefault(crvObject => crvObject.Ident.LokalId == localId);
+
+                    segments.Add(new SosiSegment(curveObject.Points, curveObject.SequenceNumber, curveObject.Segment.SegmentType, curveObject));
+                }
+
+                var surfaces = GeometryHelper.SegmentsToSurfaces(segments);
+
+                for (var i = 0; i < surfaceObjs.Count; i++)
+                {
+                    var surface = surfaces[i];
+                    var surfaceObject = surfaceObjs[i];
+
+                    surfaceObject.SetReferences(surface);
+                    surfaceObject.SetPointOnSurface(surface);
+
+                    surfaceObjects.Add(surfaceObject);
+                }
+            }
+
+            var curveObjects = curveObjectsDict.SelectMany(kvp => kvp.Value);
+
+            sosiElements.AddRange(curveObjects);
+            sosiElements.AddRange(surfaceObjects);
+
+            LogInformation<TSosiCurveModel>(curveObjects.Count(), start);
+            LogInformation<TSosiSurfaceModel>(surfaceObjects.Count, start);
+        }
+
+        private void MapSosiSurfaceAndCurveObjectsFromAssociations<TSosiSurfaceModel, TSosiCurveModel>(
             List<XElement> featureElements, GmlDocument document, double resolution, ref int sequenceNumber, List<SosiElement> sosiElements, DateTime start)
             where TSosiSurfaceModel : SosiSurfaceObject
             where TSosiCurveModel : SosiCurveObject, new()
         {
-
             var surfaceMapper = _serviceProvider.GetRequiredService<ISosiElementMapper<TSosiSurfaceModel>>();
             var curveObjectsDict = CreateCurveObjects<TSosiCurveModel>(featureElements, document, resolution, ref sequenceNumber);
             var surfaceObjects = new List<TSosiSurfaceModel>();
@@ -146,7 +291,7 @@ namespace DiBK.Gml2Sosi.Application.Mappers
 
                     var curveObject = crvObjects.SingleOrDefault(crvObject => crvObject.Ident.LokalId == localId);
 
-                    segments.Add(new SosiSegment(curveObject.Points, curveObject.SequenceNumber, curveObject.Segment.SegmentType));
+                    segments.Add(new SosiSegment(curveObject.Points, curveObject.SequenceNumber, curveObject.Segment.SegmentType, curveObject));
                 }
 
                 var surfaces = GeometryHelper.SegmentsToSurfaces(segments);
@@ -173,21 +318,118 @@ namespace DiBK.Gml2Sosi.Application.Mappers
         }
 
         private void MapSosiSurfaceAndCurveObjectsFromSurfaces<TSosiSurfaceModel, TSosiCurveModel>(
-            GmlDocument document, double resolution, ref int sequenceNumber, List<SosiElement> sosiElements, DateTime start)
+            GmlDocument document, double resolution, List<SosiElement> sosiElements, DateTime start)
             where TSosiSurfaceModel : SosiSurfaceObject
             where TSosiCurveModel : SosiCurveObject, new()
         {
-            var s = DateTime.Now;
+            var sn = 0;
             var result = CreateBoundariesFromSurfaces<TSosiSurfaceModel>(document);
-            _logger.LogInformation("CreateBoundariesFromSurfaces: {timeUsed}", DateTime.Now.Subtract(s).TotalSeconds);
-
             var curveObjects = new Dictionary<string, List<TSosiCurveModel>>();
             var surfaceObjects = new List<TSosiSurfaceModel>();
             var surfaceMapper = _serviceProvider.GetRequiredService<ISosiElementMapper<TSosiSurfaceModel>>();
 
-            var s1 = DateTime.Now;
+            foreach (var grouping in result.GroupedArcs)
+            {
+                var firstArc = grouping.First();
+                var featureElement = result.FeatureElements[firstArc.SurfaceLocalId];
+                var curveObject = MapCurveObject<TSosiCurveModel>(featureElement.Feature, CartographicElementType.BueP, firstArc.LineString, document, resolution);
+                var localIds = grouping.Select(arc => arc.SurfaceLocalId);
 
-            var sGa = DateTime.Now;
+                foreach (var localId in localIds)
+                {
+                    if (!curveObjects.ContainsKey(localId))
+                        curveObjects.Add(localId, new List<TSosiCurveModel> { curveObject });
+                    else
+                        curveObjects[localId].Add(curveObject);
+                }
+            }
+
+            foreach (var grouping in result.GroupedDifferences)
+            {
+                var firstDifference = grouping.First();
+                var featureElement = result.FeatureElements[firstDifference.SurfaceLocalId];
+                var curveObject = MapCurveObject<TSosiCurveModel>(featureElement.Feature, CartographicElementType.Kurve, firstDifference.LineString, document, resolution);
+                var localIds = grouping.Select(difference => difference.SurfaceLocalId);
+
+                foreach (var localId in localIds)
+                {
+                    if (!curveObjects.ContainsKey(localId))
+                        curveObjects.Add(localId, new List<TSosiCurveModel> { curveObject });
+                    else
+                        curveObjects[localId].Add(curveObject);
+                }
+            }
+
+            foreach (var grouping in result.GroupedIntersections)
+            {
+                var firstIntersection = grouping.First();
+                var featureElement = result.FeatureElements[firstIntersection.SurfaceLocalId];
+                var curveObject = MapCurveObject<TSosiCurveModel>(featureElement.Feature, CartographicElementType.Kurve, firstIntersection.LineString, document, resolution);
+
+                var localIds = grouping
+                    .SelectMany(intersection => new[] { intersection.SurfaceLocalId, intersection.IntersectingSurfaceLocalId })
+                    .Distinct()
+                    .ToList();
+
+                foreach (var localId in localIds)
+                {
+                    if (!curveObjects.ContainsKey(localId))
+                        curveObjects.Add(localId, new List<TSosiCurveModel> { curveObject });
+                    else
+                        curveObjects[localId].Add(curveObject);
+                }
+            }
+
+            foreach (var (localId, featureElement) in result.FeatureElements)
+            {
+                var surfaceObject = surfaceMapper.Map(featureElement.Feature, document, ref sn);
+                surfaceObject.Ident.LokalId = localId;
+
+                var curveObjs = curveObjects[localId];
+
+                var clonedSegments = curveObjs
+                    .Select(curveObject =>
+                    {
+                        var clone = curveObject.Segment.Clone();
+                        clone.IsReversed = false;
+
+                        return clone;
+                    });
+
+                var surfaces = GeometryHelper.SegmentsToSurfaces(clonedSegments);
+                var firstSurface = surfaces.FirstOrDefault();
+
+                surfaceObject.Surface = surfaces.FirstOrDefault();
+
+                //surfaceObject.SetReferences(firstSurface);
+                //surfaceObject.SetPointOnSurface(featureElement.Geometry, resolution);
+
+                surfaceObjects.Add(surfaceObject);
+            }
+
+            var distinctCurveObjects = curveObjects
+                .SelectMany(curveObject => curveObject.Value)
+                .DistinctBy(curveObject => curveObject.Ident.LokalId);
+
+            SosiCurveObject.AddNodesToCurves(distinctCurveObjects);
+
+            sosiElements.AddRange(distinctCurveObjects);
+            sosiElements.AddRange(surfaceObjects);
+
+            LogInformation<TSosiCurveModel>(distinctCurveObjects.Count(), start);
+            LogInformation<TSosiSurfaceModel>(surfaceObjects.Count, start);
+        }
+
+        private void MapSosiSurfaceAndCurveObjectsFromSurfaces<TSosiSurfaceModel, TSosiCurveModel>(
+            GmlDocument document, double resolution, ref int sequenceNumber, List<SosiElement> sosiElements, DateTime start)
+            where TSosiSurfaceModel : SosiSurfaceObject
+            where TSosiCurveModel : SosiCurveObject, new()
+        {
+            var result = CreateBoundariesFromSurfaces<TSosiSurfaceModel>(document);
+
+            var curveObjects = new Dictionary<string, List<TSosiCurveModel>>();
+            var surfaceObjects = new List<TSosiSurfaceModel>();
+            var surfaceMapper = _serviceProvider.GetRequiredService<ISosiElementMapper<TSosiSurfaceModel>>();
 
             foreach (var grouping in result.GroupedArcs)
             {
@@ -205,10 +447,6 @@ namespace DiBK.Gml2Sosi.Application.Mappers
                 }
             }
 
-            _logger.LogInformation("GroupedArcs: {timeUsed}", DateTime.Now.Subtract(sGa).TotalSeconds);
-
-            var sGd = DateTime.Now;
-
             foreach (var grouping in result.GroupedDifferences)
             {
                 var firstDifference = grouping.First();
@@ -224,10 +462,6 @@ namespace DiBK.Gml2Sosi.Application.Mappers
                         curveObjects[localId].Add(curveObject);
                 }
             }
-
-            _logger.LogInformation("GroupedDifferences: {timeUsed}", DateTime.Now.Subtract(sGd).TotalSeconds);
-
-            var sGi = DateTime.Now;
 
             foreach (var grouping in result.GroupedIntersections)
             {
@@ -249,10 +483,6 @@ namespace DiBK.Gml2Sosi.Application.Mappers
                 }
             }
 
-            _logger.LogInformation("GroupedIntersections: {timeUsed}", DateTime.Now.Subtract(sGi).TotalSeconds);
-            
-            var sSrf = DateTime.Now;
-
             foreach (var (localId, featureElement) in result.FeatureElements)
             {
                 var surfaceObject = surfaceMapper.Map(featureElement.Feature, document, ref sequenceNumber);
@@ -272,13 +502,11 @@ namespace DiBK.Gml2Sosi.Application.Mappers
                 var surfaces = GeometryHelper.SegmentsToSurfaces(clonedSegments);
                 var firstSurface = surfaces.FirstOrDefault();
 
-                surfaceObject.SetReferences(firstSurface);
+                //surfaceObject.SetReferences(firstSurface);
                 surfaceObject.SetPointOnSurface(featureElement.Geometry, resolution);
 
                 surfaceObjects.Add(surfaceObject);
             }
-
-            _logger.LogInformation("Surfaces: {timeUsed}", DateTime.Now.Subtract(sSrf).TotalSeconds);
 
             var distinctCurveObjects = curveObjects
                 .SelectMany(curveObject => curveObject.Value)
@@ -286,13 +514,43 @@ namespace DiBK.Gml2Sosi.Application.Mappers
 
             SosiCurveObject.AddNodesToCurves(distinctCurveObjects);
 
-            _logger.LogInformation("Rest: {timeUsed}", DateTime.Now.Subtract(s1).TotalSeconds);
-
             sosiElements.AddRange(distinctCurveObjects);
             sosiElements.AddRange(surfaceObjects);
 
             LogInformation<TSosiCurveModel>(distinctCurveObjects.Count(), start);
             LogInformation<TSosiSurfaceModel>(surfaceObjects.Count, start);
+        }
+
+        private Dictionary<string, List<TSosiCurveModel>> CreateCurveObjects<TSosiCurveModel>(
+            List<XElement> featureElements, GmlDocument document, double resolution)
+            where TSosiCurveModel : SosiCurveObject, new()
+        {            
+            var curveObjectsDict = new Dictionary<string, List<TSosiCurveModel>>();
+
+            foreach (var featureElement in featureElements)
+            {
+                var geomElement = GmlHelper.GetFeatureGeometryElements(featureElement).FirstOrDefault();
+                var segmentElements = geomElement.XPath2SelectElements("*:segments/*");
+                var segmentElementCount = segmentElements.Count();
+                var tempLocalId = GetLocalId(featureElement);
+                var index = 0;
+
+                foreach (var segmentElement in segmentElements)
+                {
+                    var localId = segmentElementCount == 1 ? tempLocalId : $"{tempLocalId}-{index++}";
+                    var curveObject = MapCurveObject<TSosiCurveModel>(featureElement, segmentElement, document, resolution);
+                    curveObject.Ident.LokalId = localId;
+
+                    if (!curveObjectsDict.ContainsKey(tempLocalId))
+                        curveObjectsDict.Add(tempLocalId, new List<TSosiCurveModel> { curveObject });
+                    else
+                        curveObjectsDict[tempLocalId].Add(curveObject);
+                }
+            }
+
+            SosiCurveObject.AddNodesToCurves(curveObjectsDict.SelectMany(kvp => kvp.Value));
+
+            return curveObjectsDict;
         }
 
         private Dictionary<string, List<TSosiCurveModel>> CreateCurveObjects<TSosiCurveModel>(

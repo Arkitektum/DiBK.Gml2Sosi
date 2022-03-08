@@ -48,7 +48,12 @@ namespace DiBK.Gml2Sosi.Application.Models.SosiObjects
         {
             var memoryStream = new MemoryStream();
             var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8);
-            var orderedElements = sosiElements.OrderBy(sosiElement => sosiElement.SequenceNumber);
+
+            for (var i = 0; i < sosiElements.Count; i++)
+                sosiElements[i].SequenceNumber = i;
+
+            /*var s = (SosiSurfaceObject) sosiElements.Where(se => se.GetType().Name == "RpArealformålOmråde").FirstOrDefault();
+            var orderedElements = sosiElements.OrderBy(sosiElement => sosiElement.SequenceNumber);*/
 
             foreach (var element in sosiElements)
                 await element.WriteToStreamAsync(streamWriter);

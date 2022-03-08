@@ -8,10 +8,14 @@ namespace DiBK.Gml2Sosi.Application.Models.SosiObjects
     {
         public string Referanser { get; private set; }
         public SosiPoint Representasjonspunkt { get; private set; }
+        public Surface Surface { get; set; }
 
         protected override void SetSosiValues()
         {
             base.SetSosiValues();
+
+            SetReferences(Surface);
+            SetPointOnSurface(Surface);
 
             if (string.IsNullOrWhiteSpace(Referanser))
                 return;
@@ -35,7 +39,7 @@ namespace DiBK.Gml2Sosi.Application.Models.SosiObjects
                 return;
 
             var exteriorRefs = surface.Exterior.Segments
-                .Select(segment => $":{(segment.IsReversed ? "-" : "")}{segment.SequenceNumber}");
+                .Select(segment => $":{(segment.IsReversed ? "-" : "")}{segment.CurveObject.SequenceNumber}");
 
             var refs = string.Join(" ", exteriorRefs);
 
@@ -44,7 +48,7 @@ namespace DiBK.Gml2Sosi.Application.Models.SosiObjects
                 foreach (var interior in surface.Interior)
                 {
                     var interiorRefs = interior.Segments
-                        .Select(segment => $":{(segment.IsReversed ? "-" : "")}{segment.SequenceNumber}");
+                        .Select(segment => $":{(segment.IsReversed ? "-" : "")}{segment.CurveObject.SequenceNumber}");
 
                     refs += $" ({string.Join(" ", interiorRefs)})";
                 }
