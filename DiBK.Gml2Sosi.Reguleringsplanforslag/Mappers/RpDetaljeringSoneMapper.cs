@@ -17,9 +17,9 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
             _rpHensynSoneMapper = rpHensynSoneMapper;
         }
 
-        public RpDetaljeringSone Map(XElement featureElement, GmlDocument document, ref int sequenceNumber)
+        public RpDetaljeringSone Map(XElement featureElement, GmlDocument document)
         {
-            var rpDetaljeringSone = _rpHensynSoneMapper.Map<RpDetaljeringSone>(featureElement, document, ref sequenceNumber);
+            var rpDetaljeringSone = _rpHensynSoneMapper.Map<RpDetaljeringSone>(featureElement, document);
 
             rpDetaljeringSone.Detaljering = featureElement.XPath2SelectElement("*:detaljering")?.Value;
 

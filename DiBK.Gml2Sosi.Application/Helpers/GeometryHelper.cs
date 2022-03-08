@@ -148,7 +148,7 @@ namespace DiBK.Gml2Sosi.Application.Helpers
                     }
                     else if (lastPoint.Equals(segment.Points.Last()))
                     {
-                        var newSegment = new SosiSegment(Enumerable.Reverse(segment.Points).ToList(), segment.SequenceNumber, segment.SegmentType, segment.CurveObject, true);
+                        var newSegment = new SosiSegment(Enumerable.Reverse(segment.Points).ToList(), segment.SegmentType, segment.CurveObject, true);
                         rings.Last().Segments.Add(newSegment);
                         restSegments.Remove(segment);
                         found = true;

@@ -21,9 +21,9 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
             _nasjonalArealplanIdMapper = nasjonalArealplanIdMapper;
         }
 
-        public RpBestemmelseOmråde Map(XElement featureElement, GmlDocument document, ref int sequenceNumber)
+        public RpBestemmelseOmråde Map(XElement featureElement, GmlDocument document)
         {
-            var rpBestemmelseOmråde = _sosiObjectTypeMapper.Map<RpBestemmelseOmråde>(featureElement, document, ref sequenceNumber);
+            var rpBestemmelseOmråde = _sosiObjectTypeMapper.Map<RpBestemmelseOmråde>(featureElement, document);
             var rpOmrådeElement = GetReferencedRpOmrådeElement(featureElement, document);
 
             rpBestemmelseOmråde.NasjonalArealplanId = _nasjonalArealplanIdMapper.Map(featureElement, document);

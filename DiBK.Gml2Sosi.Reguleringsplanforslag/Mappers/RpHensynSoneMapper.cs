@@ -23,9 +23,9 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
             _nasjonalArealplanIdMapper = nasjonalArealplanIdMapper;
         }
 
-        public TSosiModel Map<TSosiModel>(XElement featureElement, GmlDocument document, ref int sequenceNumber) where TSosiModel : RpHensynSone, new()
+        public TSosiModel Map<TSosiModel>(XElement featureElement, GmlDocument document) where TSosiModel : RpHensynSone, new()
         {
-            var rpHensynSone = _sosiObjectTypeMapper.Map<TSosiModel>(featureElement, document, ref sequenceNumber);
+            var rpHensynSone = _sosiObjectTypeMapper.Map<TSosiModel>(featureElement, document);
             var rpOmrådeElement = GetReferencedRpOmrådeElement(featureElement, document);
 
             rpHensynSone.NasjonalArealplanId = _nasjonalArealplanIdMapper.Map(featureElement, document);

@@ -22,9 +22,9 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
             _nasjonalArealplanIdMapper = nasjonalArealplanIdMapper;
         }
 
-        public PblMidlByggAnleggOmråde Map(XElement featureElement, GmlDocument document, ref int sequenceNumber)
+        public PblMidlByggAnleggOmråde Map(XElement featureElement, GmlDocument document)
         {
-            var pblMidlByggAnleggOmråde = _sosiObjectMapper.Map<PblMidlByggAnleggOmråde>(featureElement, document, ref sequenceNumber);
+            var pblMidlByggAnleggOmråde = _sosiObjectMapper.Map<PblMidlByggAnleggOmråde>(featureElement, document);
             var rpOmrådeElement = GetReferencedRpOmrådeElement(featureElement, document);
 
             pblMidlByggAnleggOmråde.NasjonalArealplanId = _nasjonalArealplanIdMapper.Map(featureElement, document);

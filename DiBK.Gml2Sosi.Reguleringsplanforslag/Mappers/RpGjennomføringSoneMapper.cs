@@ -17,9 +17,9 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
             _rpHensynSoneMapper = rpHensynSoneMapper;
         }
 
-        public RpGjennomføringSone Map(XElement featureElement, GmlDocument document, ref int sequenceNumber)
+        public RpGjennomføringSone Map(XElement featureElement, GmlDocument document)
         {
-            var rpGjennomføringSone = _rpHensynSoneMapper.Map<RpGjennomføringSone>(featureElement, document, ref sequenceNumber);
+            var rpGjennomføringSone = _rpHensynSoneMapper.Map<RpGjennomføringSone>(featureElement, document);
 
             rpGjennomføringSone.Gjennomføring = featureElement.XPath2SelectElement("*:gjennomføring")?.Value;
 

@@ -20,10 +20,10 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
             _settings = datasets.GetSettings(Dataset.Reguleringsplanforslag);
         }
 
-        public RpFormålGrense Map(XElement featureElement, GmlDocument document, ref int sequenceNumber)
+        public RpFormålGrense Map(XElement featureElement, GmlDocument document)
         {
             var geomElement = featureElement.XPath2SelectElement("*:grense/*");
-            var rpFormålGrense = MapCurveObject<RpFormålGrense>(featureElement, geomElement, document, _settings.Resolution, ref sequenceNumber);
+            var rpFormålGrense = MapCurveObject<RpFormålGrense>(featureElement, geomElement, document, _settings.Resolution);
 
             return rpFormålGrense;
         }

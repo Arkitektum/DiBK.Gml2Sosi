@@ -17,9 +17,9 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
             _rpHensynSoneMapper = rpHensynSoneMapper;
         }
 
-        public RpAngittHensynSone Map(XElement featureElement, GmlDocument document, ref int sequenceNumber)
+        public RpAngittHensynSone Map(XElement featureElement, GmlDocument document)
         {
-            var rpAngittHensynSone = _rpHensynSoneMapper.Map<RpAngittHensynSone>(featureElement, document, ref sequenceNumber);
+            var rpAngittHensynSone = _rpHensynSoneMapper.Map<RpAngittHensynSone>(featureElement, document);
 
             rpAngittHensynSone.AngittHensyn = featureElement.XPath2SelectElement("*:angittHensyn")?.Value;
 

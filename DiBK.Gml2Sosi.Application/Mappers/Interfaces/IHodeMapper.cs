@@ -6,6 +6,6 @@ namespace DiBK.Gml2Sosi.Application.Mappers.Interfaces
 {
     public interface IHodeMapper
     {
-        void Map(GmlDocument document, DatasetSettings settings, List<SosiElement> sosiElements);
+        Hode Map(GmlDocument document, DatasetSettings settings);
     }
 }

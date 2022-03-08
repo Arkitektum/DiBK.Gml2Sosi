@@ -29,9 +29,10 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
             _settings = datasets.GetSettings(Dataset.Reguleringsplanforslag);
         }
 
-        public void Map(GmlDocument document, List<SosiElement> sosiElements)
+        public List<SosiElement> Map(GmlDocument document)
         {
             var start = DateTime.Now;
+            var sosiElements = new List<SosiElement>();
             var featureElements = document.GetFeatureElements(FeatureMemberName);
             var elementCount = 0;
 
@@ -51,6 +52,8 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
             }
 
             LogInformation<RpJuridiskLinje>(elementCount, start);
+
+            return sosiElements;
         }
 
         private RpJuridiskLinje Map(XElement featureElement, XElement geomElement, GmlDocument document)

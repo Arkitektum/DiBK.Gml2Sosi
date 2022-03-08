@@ -17,9 +17,9 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
             _rpHensynSoneMapper = rpHensynSoneMapper;
         }
 
-        public RpInfrastrukturSone Map(XElement featureElement, GmlDocument document, ref int sequenceNumber)
+        public RpInfrastrukturSone Map(XElement featureElement, GmlDocument document)
         {
-            var rpInfrastrukturSone = _rpHensynSoneMapper.Map<RpInfrastrukturSone>(featureElement, document, ref sequenceNumber);
+            var rpInfrastrukturSone = _rpHensynSoneMapper.Map<RpInfrastrukturSone>(featureElement, document);
 
             rpInfrastrukturSone.Infrastruktur = featureElement.XPath2SelectElement("*:infrastruktur")?.Value;
 

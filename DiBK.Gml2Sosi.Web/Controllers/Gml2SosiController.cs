@@ -30,7 +30,7 @@ namespace DiBK.Gml2Sosi.Web.Controllers
                 if (gmlFile == null)
                     return BadRequest();
 
-                var document = await _rpfGml2SosiService.Gml2Sosi(gmlFile);
+                var document = await _rpfGml2SosiService.Gml2SosiAsync(gmlFile);
 
                 return File(document, "text/vnd.sosi", $"{Path.ChangeExtension(gmlFile.FileName, "sos")}");
             }

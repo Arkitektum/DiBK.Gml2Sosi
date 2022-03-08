@@ -18,9 +18,9 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
             _rpHensynSoneMapper = rpHensynSoneMapper;
         }
 
-        public RpBåndleggingSone Map(XElement featureElement, GmlDocument document, ref int sequenceNumber)
+        public RpBåndleggingSone Map(XElement featureElement, GmlDocument document)
         {
-            var rpBåndleggingSone = _rpHensynSoneMapper.Map<RpBåndleggingSone>(featureElement, document, ref sequenceNumber);
+            var rpBåndleggingSone = _rpHensynSoneMapper.Map<RpBåndleggingSone>(featureElement, document);
 
             rpBåndleggingSone.Båndlegging = featureElement.XPath2SelectElement("*:båndlegging")?.Value;
             rpBåndleggingSone.BåndlagtFremTil = FormatDate(featureElement.XPath2SelectElement("*:båndlagtFremTil"));

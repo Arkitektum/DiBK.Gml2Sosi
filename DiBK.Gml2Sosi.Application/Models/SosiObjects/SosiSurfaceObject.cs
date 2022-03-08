@@ -1,21 +1,20 @@
 ﻿using DiBK.Gml2Sosi.Application.Helpers;
 using DiBK.Gml2Sosi.Application.Models.Geometries;
-using System.Xml.Linq;
 
 namespace DiBK.Gml2Sosi.Application.Models.SosiObjects
 {
     public abstract class SosiSurfaceObject : SosiObjectType
     {
+        public Surface Surface { get; set; }
         public string Referanser { get; private set; }
         public SosiPoint Representasjonspunkt { get; private set; }
-        public Surface Surface { get; set; }
 
         protected override void SetSosiValues()
         {
             base.SetSosiValues();
 
-            SetReferences(Surface);
-            SetPointOnSurface(Surface);
+            SetReferences();
+            SetPointOnSurface();
 
             if (string.IsNullOrWhiteSpace(Referanser))
                 return;
@@ -25,27 +24,19 @@ namespace DiBK.Gml2Sosi.Application.Models.SosiObjects
             SosiValues.Add(Representasjonspunkt.ToString());
         }
 
-        public void SetReferences(IEnumerable<SosiCurveObject> boundaryObjects)
+        private void SetReferences()
         {
-            var segments = boundaryObjects.Select(boundaryObject => new SosiSegment(boundaryObject));
-            var surface = GeometryHelper.SegmentsToSurfaces(segments).FirstOrDefault();
-
-            SetReferences(surface);
-        }
-
-        public void SetReferences(Surface surface)
-        {
-            if (surface == null)
+            if (Surface == null)
                 return;
 
-            var exteriorRefs = surface.Exterior.Segments
+            var exteriorRefs = Surface.Exterior.Segments
                 .Select(segment => $":{(segment.IsReversed ? "-" : "")}{segment.CurveObject.SequenceNumber}");
 
             var refs = string.Join(" ", exteriorRefs);
 
-            if (surface.Interior.Any())
+            if (Surface.Interior.Any())
             {
-                foreach (var interior in surface.Interior)
+                foreach (var interior in Surface.Interior)
                 {
                     var interiorRefs = interior.Segments
                         .Select(segment => $":{(segment.IsReversed ? "-" : "")}{segment.CurveObject.SequenceNumber}");
@@ -57,21 +48,12 @@ namespace DiBK.Gml2Sosi.Application.Models.SosiObjects
             Referanser = refs;
         }
 
-        public void SetPointOnSurface(XElement geomElement, double resolution)
+        private void SetPointOnSurface()
         {
-            using var surfaceGeometry = GeometryHelper.OgrGeometryFromGml(geomElement);
-
-            if (surfaceGeometry == null)
+            if (Surface == null)
                 return;
 
-            using var point = surfaceGeometry.PointOnSurface();
-
-            Representasjonspunkt = SosiPoint.Create(point.GetX(0), point.GetY(0), resolution);
-        }
-
-        public void SetPointOnSurface(Surface surface)
-        {
-            using var surfaceGeometry = GeometryHelper.OgrGeometryFromWkt(surface.ToWkt());
+            using var surfaceGeometry = GeometryHelper.OgrGeometryFromWkt(Surface.ToWkt());
 
             if (surfaceGeometry == null)
                 return;

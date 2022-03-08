@@ -6,6 +6,6 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers.Interfaces
 {
     public interface IRpHensynSoneMapper
     {
-        TSosiModel Map<TSosiModel>(XElement featureElement, GmlDocument document, ref int sequenceNumber) where TSosiModel : RpHensynSone, new();
+        TSosiModel Map<TSosiModel>(XElement featureElement, GmlDocument document) where TSosiModel : RpHensynSone, new();
     }
 }

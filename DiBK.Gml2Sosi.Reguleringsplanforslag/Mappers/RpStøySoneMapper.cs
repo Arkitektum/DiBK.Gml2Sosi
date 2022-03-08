@@ -17,9 +17,9 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
             _rpHensynSoneMapper = rpHensynSoneMapper;
         }
 
-        public RpStøySone Map(XElement featureElement, GmlDocument document, ref int sequenceNumber)
+        public RpStøySone Map(XElement featureElement, GmlDocument document)
         {
-            var rpStøySone = _rpHensynSoneMapper.Map<RpStøySone>(featureElement, document, ref sequenceNumber);
+            var rpStøySone = _rpHensynSoneMapper.Map<RpStøySone>(featureElement, document);
 
             rpStøySone.Støy = featureElement.XPath2SelectElement("*:støy")?.Value;
 

@@ -28,9 +28,9 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
             _settings = datasets.GetSettings(Dataset.Reguleringsplanforslag);
         }
 
-        public RpJuridiskPunkt Map(XElement featureElement, GmlDocument document, ref int sequenceNumber)
+        public RpJuridiskPunkt Map(XElement featureElement, GmlDocument document)
         {
-            var rpJuridiskPunkt = _sosiObjectTypeMapper.Map<RpJuridiskPunkt>(featureElement, document, ref sequenceNumber);
+            var rpJuridiskPunkt = _sosiObjectTypeMapper.Map<RpJuridiskPunkt>(featureElement, document);
 
             rpJuridiskPunkt.NasjonalArealplanId = _nasjonalArealplanIdMapper.Map(featureElement, document);
             rpJuridiskPunkt.JuridiskPunkt = featureElement.XPath2SelectElement("*:juridiskpunkt")?.Value;
@@ -49,24 +49,24 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
         {
             var geomElement = element.XPath2SelectElement("*:posisjon/*");
             var symbolretning = element.XPath2SelectElement("*:symbolretning")?.Value;
-            var punkt = GeometryHelper.GetSosiPoints(geomElement, _settings.Resolution).SingleOrDefault();
-            var punkter = new List<SosiPoint> { punkt };
+            var point = GeometryHelper.GetSosiPoints(geomElement, _settings.Resolution).SingleOrDefault();
+            var points = new List<SosiPoint> { point };
 
             if (string.IsNullOrWhiteSpace(symbolretning))
-                return punkter;
+                return points;
 
-            var vektorpunkt = symbolretning.Split(" ");
+            var vectorPoints = symbolretning.Split(" ");
 
-            if (vektorpunkt.Length != 2 || !double.TryParse(vektorpunkt[0].Trim(), out var vektorpunktX) || !double.TryParse(vektorpunkt[1].Trim(), out var vektorpunktY))
-                return punkter;
+            if (vectorPoints.Length != 2 || !double.TryParse(vectorPoints[0].Trim(), out var vectorPointX) || !double.TryParse(vectorPoints[1].Trim(), out var vectorPointY))
+                return points;
 
-            var x = Math.Round(punkt.X * _settings.Resolution + vektorpunktX, 2);
-            var y = Math.Round(punkt.Y * _settings.Resolution + vektorpunktY, 2);
+            var x = Math.Round(point.X * _settings.Resolution + vectorPointX, 2);
+            var y = Math.Round(point.Y * _settings.Resolution + vectorPointY, 2);
 
-            punkter.Add(punkt);
-            punkter.Add(SosiPoint.Create(x, y, _settings.Resolution));
+            points.Add(point);
+            points.Add(SosiPoint.Create(x, y, _settings.Resolution));
 
-            return punkter;
+            return points;
         }
     }
 }

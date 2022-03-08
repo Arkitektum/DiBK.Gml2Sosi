@@ -10,7 +10,7 @@ namespace DiBK.Gml2Sosi.Application.Mappers
 {
     public class HodeMapper : IHodeMapper
     {
-        public void Map(GmlDocument document, DatasetSettings settings, List<SosiElement> sosiElements)
+        public Hode Map(GmlDocument document, DatasetSettings settings)
         {
             var rootElement = document.Document.Root;
             var srsNameElement = rootElement.Descendants()
@@ -39,7 +39,7 @@ namespace DiBK.Gml2Sosi.Application.Mappers
                 }
             };
 
-            sosiElements.Add(hode);
+            return hode;
         }
 
         private static string GetEnvelopePoint(XElement element, Func<double, double> roundingFunc)

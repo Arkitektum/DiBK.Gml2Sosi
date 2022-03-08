@@ -28,9 +28,9 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
             _settings = datasets.GetSettings(Dataset.Reguleringsplanforslag);
         }
 
-        public RpPåskrift Map(XElement element, GmlDocument document, ref int sequenceNumber)
+        public RpPåskrift Map(XElement element, GmlDocument document)
         {
-            var rpPåskrift = _sosiObjectTypeMapper.Map<RpPåskrift>(element, document, ref sequenceNumber);
+            var rpPåskrift = _sosiObjectTypeMapper.Map<RpPåskrift>(element, document);
             var rpOmrådeElement = GetRpOmrådeElement(element, document);
             var geomElement = element.XPath2SelectElement("*:tekstplassering/*");
             var punkter = GeometryHelper.GetSosiPoints(geomElement, _settings.Resolution);

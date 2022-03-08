@@ -5,6 +5,6 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers.Interfaces
 {
     public interface IRpHandlingOmrådeMapper
     {
-        void Map(GmlDocument document, List<SosiElement> sosiObjects);
+        List<SosiElement> Map(GmlDocument document);
     }
 }
