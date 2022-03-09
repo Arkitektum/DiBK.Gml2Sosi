@@ -31,7 +31,7 @@ services.AddEndpointsApiExplorer();
 
 services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo { Title = "DiBK GML to SOSI Converter", Version = "v1" });
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "DiBK GML => SOSI", Version = "v1" });
     options.OperationFilter<MultipartOperationFilter>();
 });
 

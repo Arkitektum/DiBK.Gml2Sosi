@@ -8,7 +8,8 @@ namespace DiBK.Gml2Sosi.Application.Services.MultipartRequest
 {
     public class MultipartRequestService : IMultipartRequestService
     {
-        private static readonly Regex _gml32Regex = new(@"^<\?xml.*?<\w+:FeatureCollection.*?xmlns:\w+=""http:\/\/www\.opengis\.net\/gml\/3\.2""", RegexOptions.Compiled | RegexOptions.Singleline);
+        private static readonly Regex _gml32Regex = 
+            new(@"^<\?xml.*?<\w+:FeatureCollection.*?xmlns:\w+=""http:\/\/www\.opengis\.net\/gml\/3\.2""", RegexOptions.Compiled | RegexOptions.Singleline);
 
         private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -17,7 +18,7 @@ namespace DiBK.Gml2Sosi.Application.Services.MultipartRequest
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<IFormFile> GetFileFromMultipart()
+        public async Task<IFormFile> GetFileFromMultipartAsync()
         {
             var request = _httpContextAccessor.HttpContext.Request;
             var reader = new MultipartReader(request.GetMultipartBoundary(), request.Body);

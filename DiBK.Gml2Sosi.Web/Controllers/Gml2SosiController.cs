@@ -25,7 +25,7 @@ namespace DiBK.Gml2Sosi.Web.Controllers
         {
             try
             {
-                var gmlFile = await _multipartRequestService.GetFileFromMultipart();
+                var gmlFile = await _multipartRequestService.GetFileFromMultipartAsync();
 
                 if (gmlFile == null)
                     return BadRequest();

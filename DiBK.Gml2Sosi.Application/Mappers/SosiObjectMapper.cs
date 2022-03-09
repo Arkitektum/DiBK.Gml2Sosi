@@ -7,6 +7,7 @@ using DiBK.Gml2Sosi.Application.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Operation.Linemerge;
+using System.Collections.Concurrent;
 using System.Xml.Linq;
 using Wmhelp.XPath2;
 using static DiBK.Gml2Sosi.Application.Helpers.MapperHelper;
@@ -306,9 +307,9 @@ namespace DiBK.Gml2Sosi.Application.Mappers
             var featureMemberName = GetFeatureMemberName<TSosiSurfaceModel>();
             var featureElements = document.GetFeatureElements(featureMemberName);
 
-            var featureElementsDict = new Dictionary<string, FeatureElement>();
-            var lineStringSegments = new List<LineStringSegment>();
-            var arcs = new List<Arc>();
+            var featureElementsDict = new Dictionary<string, FeatureElement>(250);
+            var lineStringSegments = new List<LineStringSegment>(1000);
+            var arcs = new List<Arc>(1000);
 
             foreach (var featureElement in featureElements)
             {
