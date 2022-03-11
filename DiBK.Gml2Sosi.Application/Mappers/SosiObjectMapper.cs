@@ -367,15 +367,13 @@ namespace DiBK.Gml2Sosi.Application.Mappers
 
         private static void FindIntersections(List<LineStringSegment> lineStringSegments)
         {
-            for (int i = 0; i < lineStringSegments.Count; i++)
+            Parallel.ForEach(lineStringSegments, lineStringSegment =>
             {
-                var lineStringSegment = lineStringSegments[i];
-
-                for (int j = i + 1; j < lineStringSegments.Count; j++)
+                for (var i = 0; i < lineStringSegments.Count; i++)
                 {
-                    var otherLineStringSegment = lineStringSegments[j];
+                    var otherLineStringSegment = lineStringSegments[i];
 
-                    if (!lineStringSegment.LineString.Intersects(otherLineStringSegment.LineString))
+                    if (lineStringSegment == otherLineStringSegment || !lineStringSegment.LineString.Intersects(otherLineStringSegment.LineString))
                         continue;
 
                     var intersection = lineStringSegment.LineString.Intersection(otherLineStringSegment.LineString);
@@ -399,7 +397,7 @@ namespace DiBK.Gml2Sosi.Application.Mappers
                         }
                     }
                 }
-            }
+            });
         }
 
         private static List<LineString> MergeLineStrings(Geometry multiLineString)
