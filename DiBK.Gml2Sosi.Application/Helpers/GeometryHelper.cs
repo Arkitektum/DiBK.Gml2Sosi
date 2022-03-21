@@ -202,10 +202,10 @@ namespace DiBK.Gml2Sosi.Application.Helpers
             }
 
             foreach (var ring in rings)
-            {
                 ring.IsExterior = ring.WithinRings.Count % 2 == 0;
+
+            foreach (var ring in rings)
                 ring.WithinRings.RemoveAll(ring => !ring.IsExterior);
-            }
 
             var surfaces = rings.Where(ring => ring.IsExterior).Select(ring => new Surface { Exterior = ring }).ToList();
             var interiors = rings.Where(ring => !ring.IsExterior).OrderBy(ring => ring.WithinRings.Count);
