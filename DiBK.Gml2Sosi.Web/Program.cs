@@ -1,4 +1,5 @@
 using DiBK.Gml2Sosi.Application.Config;
+using DiBK.Gml2Sosi.Application.HttpClients.Codelist;
 using DiBK.Gml2Sosi.Application.Services.MultipartRequest;
 using DiBK.Gml2Sosi.Reguleringsplanforslag.Config;
 using DiBK.Gml2Sosi.Web.Configuration;
@@ -38,9 +39,14 @@ services.AddSwaggerGen(options =>
 services.AddHttpContextAccessor();
 services.AddTransient<IMultipartRequestService, MultipartRequestService>();
 
+services.AddMemoryCache();
+services.AddHttpClient<ICodelistHttpClient, CodelistHttpClient>();
+
 services.AddApplicationServices();
 services.AddApplicationServicesForReguleringsplanforslag();
+
 services.ConfigureDatasets(configuration);
+services.Configure<CodelistSettings>(configuration.GetSection(CodelistSettings.SectionName));
 
 var cultureInfo = new CultureInfo("en-US");
 CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
