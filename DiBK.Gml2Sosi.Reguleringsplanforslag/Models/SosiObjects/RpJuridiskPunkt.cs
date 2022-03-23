@@ -7,6 +7,8 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Models.SosiObjects
     public class RpJuridiskPunkt : SosiObjectType
     {
         public override string ObjType { get; } = "RpJuridiskPunkt";
+        [SosiProperty("..KVALITET", 4)]
+        public string Kvalitet { get; set; }
         [SosiProperty("..NASJONALAREALPLANID", 5)]
         public NasjonalArealplanId NasjonalArealplanId { get; set; }
         [SosiProperty("..RPJURPUNKT", 6)]

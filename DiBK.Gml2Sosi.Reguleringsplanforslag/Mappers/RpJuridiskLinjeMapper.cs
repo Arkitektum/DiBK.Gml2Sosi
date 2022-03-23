@@ -1,4 +1,5 @@
-﻿using DiBK.Gml2Sosi.Application.Mappers;
+﻿using DiBK.Gml2Sosi.Application.HttpClients.Codelist;
+using DiBK.Gml2Sosi.Application.Mappers;
 using DiBK.Gml2Sosi.Application.Mappers.Interfaces;
 using DiBK.Gml2Sosi.Application.Models;
 using DiBK.Gml2Sosi.Application.Models.Config;
@@ -12,13 +13,14 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
 {
     public class RpJuridiskLinjeMapper : SosiCurveObjectMapper, ISosiCurveObjectMapper<RpJuridiskLinje>
     {
-        private readonly ISosiMapper<NasjonalArealplanId> _nasjonalArealplanIdMapper;
+        private readonly ISosiMapper<NasjonalArealplanId> _nasjonalArealplanIdMapper;        
         private readonly DatasetSettings _settings;
 
         public RpJuridiskLinjeMapper(
             ISosiObjectTypeMapper sosiObjectTypeMapper,
             ISosiMapper<NasjonalArealplanId> nasjonalArealplanIdMapper,
-            Datasets datasets) : base(sosiObjectTypeMapper)
+            ICodelistHttpClient codelistHttpClient,
+            Datasets datasets) : base(sosiObjectTypeMapper, codelistHttpClient)
         {
             _nasjonalArealplanIdMapper = nasjonalArealplanIdMapper;
             _settings = datasets.GetSettings(Dataset.Reguleringsplanforslag);

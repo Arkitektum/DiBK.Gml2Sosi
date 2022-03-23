@@ -1,10 +1,13 @@
-﻿using DiBK.Gml2Sosi.Application.Models.Geometries;
+﻿using DiBK.Gml2Sosi.Application.Attributes;
+using DiBK.Gml2Sosi.Application.Models.Geometries;
 using System.Xml.Linq;
 
 namespace DiBK.Gml2Sosi.Application.Models.SosiObjects
 {
     public abstract class SosiCurveObject : SosiObjectType
     {
+        [SosiProperty("..KVALITET", 4)]
+        public string Kvalitet { get; set; }
         public SosiSegment Segment { get; set; }
 
         protected override void SetSosiValues()

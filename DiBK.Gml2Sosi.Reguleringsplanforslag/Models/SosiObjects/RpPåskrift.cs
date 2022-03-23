@@ -7,6 +7,8 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Models.SosiObjects
     public class RpPåskrift : SosiObjectType
     {
         public override string ObjType { get; } = "RpPåskrift";
+        [SosiProperty("..KVALITET", 4)]
+        public string Kvalitet { get; set; }
         [SosiProperty("..NASJONALAREALPLANID", 5)]
         public NasjonalArealplanId NasjonalArealplanId { get; set; }
         [SosiProperty("..RPPÅSKRIFTTYPE", 6)]

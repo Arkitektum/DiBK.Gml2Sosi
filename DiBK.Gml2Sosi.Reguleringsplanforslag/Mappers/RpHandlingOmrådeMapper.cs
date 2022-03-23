@@ -1,4 +1,5 @@
 ﻿using DiBK.Gml2Sosi.Application.Helpers;
+using DiBK.Gml2Sosi.Application.HttpClients.Codelist;
 using DiBK.Gml2Sosi.Application.Mappers;
 using DiBK.Gml2Sosi.Application.Mappers.Interfaces;
 using DiBK.Gml2Sosi.Application.Models;
@@ -23,7 +24,8 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
         public RpHandlingOmrådeMapper(
             ISosiObjectTypeMapper sosiObjectTypeMapper,
             ISosiMapper<NasjonalArealplanId> nasjonalArealplanIdMapper,
-            Datasets datasets) : base(sosiObjectTypeMapper)
+            ICodelistHttpClient codelistHttpClient,
+            Datasets datasets) : base(sosiObjectTypeMapper, codelistHttpClient)
         {
             _nasjonalArealplanIdMapper = nasjonalArealplanIdMapper;
             _settings = datasets.GetSettings(Dataset.Reguleringsplanforslag);

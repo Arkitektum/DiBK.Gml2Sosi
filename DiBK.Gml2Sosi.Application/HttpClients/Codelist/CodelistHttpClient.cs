@@ -36,6 +36,23 @@ namespace DiBK.Gml2Sosi.Application.HttpClients.Codelist
             return await GetCodelistAsync(_settings.MålemetodeKode);
         }
 
+        public async Task<string> GetMålemetodeAsync(XElement featureElement)
+        {
+            var målemetodeValue = featureElement.XPath2SelectElement("*:kvalitet//*:målemetode")?.Value;
+            var målemetodeKoder = await GetMålemetodeKoderAsync();
+
+            if (målemetodeKoder.Any(metode => metode.Value == målemetodeValue))
+                return målemetodeValue;
+
+            var målemetoder = await GetMålemetoderAsync();
+            var målemetode = målemetoder.SingleOrDefault(metode => metode.Value == målemetodeValue);
+
+            if (målemetode == null)
+                return målemetodeValue;
+
+            return målemetodeKoder.SingleOrDefault(metode => metode.Name == målemetode.Name)?.Value ?? målemetodeValue;
+        }
+
         private async Task<List<CodelistItem>> GetCodelistAsync(Uri uri)
         {
             return await _memoryCache.GetOrCreateAsync(uri, async entry =>

@@ -1,4 +1,5 @@
-﻿using DiBK.Gml2Sosi.Application.Mappers;
+﻿using DiBK.Gml2Sosi.Application.HttpClients.Codelist;
+using DiBK.Gml2Sosi.Application.Mappers;
 using DiBK.Gml2Sosi.Application.Mappers.Interfaces;
 using DiBK.Gml2Sosi.Application.Models;
 using DiBK.Gml2Sosi.Application.Models.Config;
@@ -15,7 +16,8 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
 
         public RpFormålGrenseMapper(
             ISosiObjectTypeMapper sosiBaseObjectMapper,
-            Datasets datasets) : base(sosiBaseObjectMapper)
+            ICodelistHttpClient codelistHttpClient,
+            Datasets datasets) : base(sosiBaseObjectMapper, codelistHttpClient)
         {
             _settings = datasets.GetSettings(Dataset.Reguleringsplanforslag);
         }

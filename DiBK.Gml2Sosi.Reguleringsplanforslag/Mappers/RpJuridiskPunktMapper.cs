@@ -1,4 +1,5 @@
 ﻿using DiBK.Gml2Sosi.Application.Helpers;
+using DiBK.Gml2Sosi.Application.HttpClients.Codelist;
 using DiBK.Gml2Sosi.Application.Mappers.Interfaces;
 using DiBK.Gml2Sosi.Application.Models;
 using DiBK.Gml2Sosi.Application.Models.Config;
@@ -16,15 +17,18 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
     {
         private readonly ISosiObjectTypeMapper _sosiObjectTypeMapper;
         private readonly ISosiMapper<NasjonalArealplanId> _nasjonalArealplanIdMapper;
+        private readonly ICodelistHttpClient _codelistHttpClient;
         private readonly DatasetSettings _settings;
 
         public RpJuridiskPunktMapper(
             ISosiObjectTypeMapper sosiObjectTypeMapper,
             ISosiMapper<NasjonalArealplanId> nasjonalArealplanIdMapper,
+            ICodelistHttpClient codelistHttpClient,
             Datasets datasets)
         {
             _sosiObjectTypeMapper = sosiObjectTypeMapper;
             _nasjonalArealplanIdMapper = nasjonalArealplanIdMapper;
+            _codelistHttpClient = codelistHttpClient;
             _settings = datasets.GetSettings(Dataset.Reguleringsplanforslag);
         }
 
@@ -33,6 +37,7 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
             var rpJuridiskPunkt = _sosiObjectTypeMapper.Map<RpJuridiskPunkt>(featureElement, document);
 
             rpJuridiskPunkt.NasjonalArealplanId = _nasjonalArealplanIdMapper.Map(featureElement, document);
+            rpJuridiskPunkt.Kvalitet = _codelistHttpClient.GetMålemetodeAsync(featureElement).Result;
             rpJuridiskPunkt.JuridiskPunkt = featureElement.XPath2SelectElement("*:juridiskpunkt")?.Value;
             rpJuridiskPunkt.Points = GetPoints(featureElement);
             rpJuridiskPunkt.ElementType = CartographicElementType.Symbol;

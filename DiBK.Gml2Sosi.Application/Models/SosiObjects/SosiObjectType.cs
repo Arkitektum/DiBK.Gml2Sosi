@@ -14,8 +14,6 @@ namespace DiBK.Gml2Sosi.Application.Models.SosiObjects
         public string FørsteDigitaliseringsdato { get; set; }
         [SosiProperty("..OPPDATERINGSDATO", 3)]
         public string Oppdateringsdato { get; set; }
-        [SosiProperty("..KVALITET", 4)]
-        public string Kvalitet { get; set; }
         public CartographicElementType ElementType { get; set; }
         public override string ElementName => $"{ElementType.GetSosiName()} {SequenceNumber}";
         public List<SosiPoint> Points { get; set; }

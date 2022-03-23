@@ -1,4 +1,5 @@
 ﻿using DiBK.Gml2Sosi.Application.Helpers;
+using DiBK.Gml2Sosi.Application.HttpClients.Codelist;
 using DiBK.Gml2Sosi.Application.Mappers.Interfaces;
 using DiBK.Gml2Sosi.Application.Models;
 using DiBK.Gml2Sosi.Application.Models.Geometries;
@@ -7,7 +8,6 @@ using DiBK.Gml2Sosi.Application.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Operation.Linemerge;
-using System.Collections.Concurrent;
 using System.Xml.Linq;
 using Wmhelp.XPath2;
 using static DiBK.Gml2Sosi.Application.Helpers.MapperHelper;
@@ -20,7 +20,8 @@ namespace DiBK.Gml2Sosi.Application.Mappers
 
         public SosiObjectMapper(
             IServiceProvider serviceProvider,
-            ISosiObjectTypeMapper sosiObjectTypeMapper) : base(sosiObjectTypeMapper)
+            ISosiObjectTypeMapper sosiObjectTypeMapper,
+            ICodelistHttpClient codelistHttpClient) : base(sosiObjectTypeMapper, codelistHttpClient)
         {
             _serviceProvider = serviceProvider;
         }

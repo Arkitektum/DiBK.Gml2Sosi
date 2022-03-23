@@ -1,4 +1,5 @@
 ﻿using DiBK.Gml2Sosi.Application.Helpers;
+using DiBK.Gml2Sosi.Application.HttpClients.Codelist;
 using DiBK.Gml2Sosi.Application.Mappers.Interfaces;
 using DiBK.Gml2Sosi.Application.Models;
 using DiBK.Gml2Sosi.Application.Models.Config;
@@ -16,32 +17,36 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
     {
         private readonly ISosiObjectTypeMapper _sosiObjectTypeMapper;
         private readonly ISosiMapper<NasjonalArealplanId> _nasjonalArealplanIdMapper;
+        private readonly ICodelistHttpClient _codelistHttpClient;
         private readonly DatasetSettings _settings;
 
         public RpPåskriftMapper(
             ISosiObjectTypeMapper sosiObjectTypeMapper,
             ISosiMapper<NasjonalArealplanId> nasjonalArealplanIdMapper,
+            ICodelistHttpClient codelistHttpClient,
             Datasets datasets)
         {
             _sosiObjectTypeMapper = sosiObjectTypeMapper;
             _nasjonalArealplanIdMapper = nasjonalArealplanIdMapper;
+            _codelistHttpClient = codelistHttpClient;
             _settings = datasets.GetSettings(Dataset.Reguleringsplanforslag);
         }
 
-        public RpPåskrift Map(XElement element, GmlDocument document)
+        public RpPåskrift Map(XElement featureElement, GmlDocument document)
         {
-            var rpPåskrift = _sosiObjectTypeMapper.Map<RpPåskrift>(element, document);
-            var rpOmrådeElement = GetRpOmrådeElement(element, document);
-            var geomElement = element.XPath2SelectElement("*:tekstplassering/*");
+            var rpPåskrift = _sosiObjectTypeMapper.Map<RpPåskrift>(featureElement, document);
+            var rpOmrådeElement = GetRpOmrådeElement(featureElement, document);
+            var geomElement = featureElement.XPath2SelectElement("*:tekstplassering/*");
             var punkter = GeometryHelper.GetSosiPoints(geomElement, _settings.Resolution);
             var firstPunkt = punkter.First();
 
             punkter.Insert(0, SosiPoint.Create(firstPunkt.X * _settings.Resolution, firstPunkt.Y * _settings.Resolution, _settings.Resolution));
 
-            rpPåskrift.NasjonalArealplanId = _nasjonalArealplanIdMapper.Map(element, document);
-            rpPåskrift.PåskriftType = element.XPath2SelectElement("*:påskriftType")?.Value;
-            rpPåskrift.Tekststreng = MapperHelper.FormatText(element.XPath2SelectElement("*:tekststreng"));
+            rpPåskrift.NasjonalArealplanId = _nasjonalArealplanIdMapper.Map(featureElement, document);
+            rpPåskrift.PåskriftType = featureElement.XPath2SelectElement("*:påskriftType")?.Value;
+            rpPåskrift.Tekststreng = MapperHelper.FormatText(featureElement.XPath2SelectElement("*:tekststreng"));
             rpPåskrift.Vertikalnivå = rpOmrådeElement?.XPath2SelectElement("*:vertikalnivå")?.Value;
+            rpPåskrift.Kvalitet = _codelistHttpClient.GetMålemetodeAsync(featureElement).Result;
             rpPåskrift.Points = punkter;
             rpPåskrift.ElementType = CartographicElementType.Tekst;
 

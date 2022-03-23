@@ -1,4 +1,5 @@
-﻿using DiBK.Gml2Sosi.Application.Mappers;
+﻿using DiBK.Gml2Sosi.Application.HttpClients.Codelist;
+using DiBK.Gml2Sosi.Application.Mappers;
 using DiBK.Gml2Sosi.Application.Mappers.Interfaces;
 using DiBK.Gml2Sosi.Application.Models;
 using DiBK.Gml2Sosi.Application.Models.Config;
@@ -18,7 +19,8 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
         public RpRegulertHøydeMapper(
             ISosiObjectTypeMapper sosiBaseObjectMapper,
             ISosiMapper<NasjonalArealplanId> nasjonalArealplanIdMapper,
-            Datasets datasets) : base(sosiBaseObjectMapper)
+            ICodelistHttpClient codelistHttpClient,
+            Datasets datasets) : base(sosiBaseObjectMapper, codelistHttpClient)
         {
             _nasjonalArealplanIdMapper = nasjonalArealplanIdMapper;
             _settings = datasets.GetSettings(Dataset.Reguleringsplanforslag);
