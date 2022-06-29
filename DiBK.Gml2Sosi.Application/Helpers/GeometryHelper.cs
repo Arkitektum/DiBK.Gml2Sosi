@@ -30,6 +30,11 @@ namespace DiBK.Gml2Sosi.Application.Helpers
             return new LineString(coordinates);
         }
 
+        public static OgrGeometry CreatePolygonFromRing(Ring ring)
+        {
+            return OgrGeometry.CreateFromWkt($"CURVEPOLYGON ({ring.ToWkt()})");
+        }
+
         public static List<SosiPoint> GetSosiPoints(XElement geomElement, double resolution)
         {
             return GetCoordinates(geomElement)
@@ -185,7 +190,7 @@ namespace DiBK.Gml2Sosi.Application.Helpers
         private static List<Surface> ConvertRingsToSurfaces(List<Ring> rings)
         {
             foreach (var ring in rings)
-                ring.Envelope = CreateEnvelope(ring);
+                ring.Polygon = CreatePolygonFromRing(ring);
 
             for (var i = 0; i < rings.Count; i++)
             {
@@ -196,7 +201,7 @@ namespace DiBK.Gml2Sosi.Application.Helpers
                 {
                     var otherRing = otherRings[j];
 
-                    if (ring.Envelope.Within(otherRing.Envelope))
+                    if (ring.Polygon.Within(otherRing.Polygon))
                         rings.SingleOrDefault(rng => rng == ring).WithinRings.Add(otherRing);
                 }
             }

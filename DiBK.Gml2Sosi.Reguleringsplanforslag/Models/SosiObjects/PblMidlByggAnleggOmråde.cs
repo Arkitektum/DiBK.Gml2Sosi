@@ -12,5 +12,7 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Models.SosiObjects
         public string Avgjørelsesdato { get; set; }
         [SosiProperty("..GYLDIGTILDATO", 1)]
         public string GyldigTilDato { get; set; }
+        [SosiProperty("..BESTEMMELSEOMRNAVN", 1)]
+        public string BestemmelseOmrådeNavn { get; set; }
     }
 }

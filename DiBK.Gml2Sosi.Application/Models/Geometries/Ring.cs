@@ -1,11 +1,11 @@
-﻿using NetTopologySuite.Geometries;
+﻿using OSGeo.OGR;
 
 namespace DiBK.Gml2Sosi.Application.Models.Geometries
 {
     public class Ring
     {
         public List<SosiSegment> Segments { get; set; } = new();
-        public Geometry Envelope { get; set; }
+        public Geometry Polygon { get; set; }
         public List<Ring> WithinRings { get; set; } = new();
         public bool IsExterior { get; set; }
 

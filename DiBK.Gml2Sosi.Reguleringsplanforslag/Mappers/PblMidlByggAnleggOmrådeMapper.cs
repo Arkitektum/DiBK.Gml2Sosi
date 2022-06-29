@@ -41,8 +41,20 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
                 };
             }
 
-            pblMidlByggAnleggOmråde.Avgjørelsesdato = FormatDate(featureElement.XPath2SelectElement("*:avgjørelsesdato"));
-            pblMidlByggAnleggOmråde.GyldigTilDato = FormatDate(featureElement.XPath2SelectElement("*:gyldigTilDato"));
+            pblMidlByggAnleggOmråde.BestemmelseOmrådeNavn = featureElement.XPath2SelectElement("*:bestemmelseOmrådeNavn")?.Value;
+
+            var avgjørelsesdatoElement = featureElement.XPath2SelectElement("*:avgjørelsesdato");
+
+            pblMidlByggAnleggOmråde.Avgjørelsesdato = avgjørelsesdatoElement != null ?
+                 FormatDate(avgjørelsesdatoElement) : 
+                 DateTime.Today.ToString("yyyyMMdd");
+
+            var gyldigTilDatoElement = featureElement.XPath2SelectElement("*:gyldigTilDato");
+
+            pblMidlByggAnleggOmråde.GyldigTilDato = gyldigTilDatoElement != null ?
+                FormatDate(gyldigTilDatoElement) :
+                DateTime.Today.AddYears(5).ToString("yyyyMMdd");
+
             pblMidlByggAnleggOmråde.ElementType = CartographicElementType.Flate;
 
             return pblMidlByggAnleggOmråde;
