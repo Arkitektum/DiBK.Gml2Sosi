@@ -29,7 +29,7 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
         public RpRegulertHøyde Map(XElement featureElement, XElement geomElement, GmlDocument document)
         {
             var rpRegulertHøyde = MapCurveObject<RpRegulertHøyde>(featureElement, geomElement, document, _settings.Resolution);
-            var rpOmrådeElement = GetReferencedRpOmrådeElement(featureElement, document);
+            var rpOmrådeElement = GetRpOmrådeElementByGeometry(featureElement, document);
 
             rpRegulertHøyde.NasjonalArealplanId = _nasjonalArealplanIdMapper.Map(featureElement, document);
             rpRegulertHøyde.Vertikalnivå = rpOmrådeElement.XPath2SelectElement("*:vertikalnivå")?.Value;

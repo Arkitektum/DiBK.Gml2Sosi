@@ -26,7 +26,7 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
         public TSosiModel Map<TSosiModel>(XElement featureElement, GmlDocument document) where TSosiModel : RpHensynSone, new()
         {
             var rpHensynSone = _sosiObjectTypeMapper.Map<TSosiModel>(featureElement, document);
-            var rpOmrådeElement = GetReferencedRpOmrådeElement(featureElement, document);
+            var rpOmrådeElement = GetRpOmrådeElementByGeometry(featureElement, document);
 
             rpHensynSone.NasjonalArealplanId = _nasjonalArealplanIdMapper.Map(featureElement, document);
             rpHensynSone.Vertikalnivå = rpOmrådeElement.XPath2SelectElement("*:vertikalnivå")?.Value;

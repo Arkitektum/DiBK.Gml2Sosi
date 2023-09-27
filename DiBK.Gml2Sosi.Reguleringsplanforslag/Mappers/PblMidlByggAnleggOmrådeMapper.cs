@@ -25,7 +25,7 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
         public PblMidlByggAnleggOmråde Map(XElement featureElement, GmlDocument document)
         {
             var pblMidlByggAnleggOmråde = _sosiObjectMapper.Map<PblMidlByggAnleggOmråde>(featureElement, document);
-            var rpOmrådeElement = GetReferencedRpOmrådeElement(featureElement, document);
+            var rpOmrådeElement = GetRpOmrådeElementByGeometry(featureElement, document);
 
             pblMidlByggAnleggOmråde.NasjonalArealplanId = _nasjonalArealplanIdMapper.Map(featureElement, document);
             pblMidlByggAnleggOmråde.Vertikalnivå = rpOmrådeElement.XPath2SelectElement("*:vertikalnivå")?.Value;

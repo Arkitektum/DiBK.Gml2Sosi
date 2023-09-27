@@ -42,7 +42,7 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
             rpJuridiskPunkt.Points = GetPoints(featureElement);
             rpJuridiskPunkt.ElementType = CartographicElementType.Symbol;
 
-            var rpOmrådeElement = GetReferencedRpOmrådeElement(featureElement, document);
+            var rpOmrådeElement = GetRpOmrådeElementByGeometry(featureElement, document);
 
             if (rpOmrådeElement != null)
                 rpJuridiskPunkt.Vertikalnivå = rpOmrådeElement.XPath2SelectElement("*:vertikalnivå")?.Value;

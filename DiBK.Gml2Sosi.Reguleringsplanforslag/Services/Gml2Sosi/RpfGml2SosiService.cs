@@ -30,7 +30,7 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Services.Gml2Sosi
 
         public async Task<MemoryStream> Gml2SosiAsync(IFormFile gmlFile)
         {
-            var document = await GmlDocument.CreateAsync(gmlFile);
+            using var document = await GmlDocument.CreateAsync(gmlFile);
             var resolution = _settings.Resolution;
 
             return await CreateSosiDocumentAsync(document, _settings, new []

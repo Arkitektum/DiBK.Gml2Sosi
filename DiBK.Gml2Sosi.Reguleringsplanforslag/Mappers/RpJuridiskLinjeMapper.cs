@@ -33,7 +33,7 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
             rpJuridiskLinje.NasjonalArealplanId = _nasjonalArealplanIdMapper.Map(featureElement, document);
             rpJuridiskLinje.JuridiskLinje = featureElement.XPath2SelectElement("*:juridisklinje")?.Value;
 
-            var rpOmrådeElement = GetReferencedRpOmrådeElement(featureElement, document);
+            var rpOmrådeElement = GetRpOmrådeElementByGeometry(featureElement, document);
 
             if (rpOmrådeElement != null)
                 rpJuridiskLinje.Vertikalnivå = rpOmrådeElement.XPath2SelectElement("*:vertikalnivå")?.Value;

@@ -1,14 +1,18 @@
 ﻿using DiBK.Gml2Sosi.Application.Constants;
 using Microsoft.AspNetCore.Http;
+using System.Collections.Concurrent;
 using System.Xml.Linq;
 
 namespace DiBK.Gml2Sosi.Application.Models
 {
-    public class GmlDocument
+    public class GmlDocument : IDisposable
     {
         private ILookup<string, XElement> _featureElements;
         private ILookup<string, XElement> _gmlElements;
         private ILookup<string, XElement> _geometryElements;
+        private readonly ConcurrentDictionary<XElement, IndexedGeometry> _geometries = new();
+        private bool _disposed = false;
+
         public XDocument Document { get; private set; }
         public string FileName { get; private set; }
 
@@ -79,6 +83,18 @@ namespace DiBK.Gml2Sosi.Application.Models
             return geometryElements;
         }
 
+        public IndexedGeometry GetOrCreateGeometry(XElement geoElement)
+        {
+            if (_geometries.TryGetValue(geoElement, out var indexed))
+                return indexed;
+
+            var newIndexed = IndexedGeometry.Create(geoElement);
+
+            _geometries.TryAdd(geoElement, newIndexed);
+
+            return newIndexed;
+        }
+
         private void Initialize(XDocument document)
         {
             var localName = document.Root.Elements()
@@ -97,6 +113,26 @@ namespace DiBK.Gml2Sosi.Application.Models
                 .SelectMany(element => element)
                 .Where(element => GmlGeometry.ElementNames.Contains(element.Name.LocalName))
                 .ToLookup(element => element.Name.LocalName);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    foreach (var index in _geometries)
+                        index.Value.Geometry?.Dispose();
+                }
+
+                _disposed = true;
+            }
         }
 
         public static async Task<GmlDocument> CreateAsync(IFormFile file)

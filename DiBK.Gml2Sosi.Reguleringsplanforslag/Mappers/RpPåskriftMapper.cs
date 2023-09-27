@@ -9,7 +9,7 @@ using DiBK.Gml2Sosi.Reguleringsplanforslag.Constants;
 using DiBK.Gml2Sosi.Reguleringsplanforslag.Models.SosiObjects;
 using System.Xml.Linq;
 using Wmhelp.XPath2;
-using Namespace = DiBK.Gml2Sosi.Application.Constants.Namespace;
+using static DiBK.Gml2Sosi.Reguleringsplanforslag.Helpers.MapperHelper;
 
 namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
 {
@@ -35,7 +35,7 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
         public RpPåskrift Map(XElement featureElement, GmlDocument document)
         {
             var rpPåskrift = _sosiObjectTypeMapper.Map<RpPåskrift>(featureElement, document);
-            var rpOmrådeElement = GetRpOmrådeElement(featureElement, document);
+            var rpOmrådeElement = GetRpOmrådeElementByGeometry(featureElement, document);
             var geomElement = featureElement.XPath2SelectElement("*:tekstplassering/*");
             var punkter = GeometryHelper.GetSosiPoints(geomElement, _settings.Resolution);
             var firstPunkt = punkter.First();
@@ -51,35 +51,6 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
             rpPåskrift.ElementType = CartographicElementType.Tekst;
 
             return rpPåskrift;
-        }
-
-        private static XElement GetRpOmrådeElement(XElement element, GmlDocument document)
-        {
-            XName name = Namespace.XLink + "href";
-
-            var refElement = GetReferencedElement(element, document, element => element.Attribute(name) != null);
-
-            if (refElement.Name.LocalName == "RpOmråde")
-                return refElement;
-
-            var rpOmrådeElement = GetReferencedElement(refElement, document, element => element.Name.LocalName == "planområde" && element.Attribute(name) != null);
-
-            return rpOmrådeElement.Name.LocalName == "RpOmråde" ? rpOmrådeElement : null;
-        }
-
-        private static XElement GetReferencedElement(XElement element, GmlDocument document, Func<XElement, bool> predicate)
-        {
-            var xLinkElement = element.Elements().FirstOrDefault(predicate);
-
-            if (xLinkElement == null)
-                return null;
-
-            var xLink = GmlHelper.GetXLink(xLinkElement);
-
-            if (xLink?.GmlId == null)
-                return null;
-
-            return document.GetElementByGmlId(xLink.GmlId);
         }
     }
 }

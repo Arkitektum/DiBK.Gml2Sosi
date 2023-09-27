@@ -25,7 +25,7 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
         public RpArealformålOmråde Map(XElement featureElement, GmlDocument document)
         {
             var rpArealformålOmråde = _sosiObjectTypeMapper.Map<RpArealformålOmråde>(featureElement, document);
-            var rpOmrådeElement = GetReferencedRpOmrådeElement(featureElement, document);
+            var rpOmrådeElement = GetRpOmrådeElementByGeometry(featureElement, document);
 
             rpArealformålOmråde.NasjonalArealplanId = _nasjonalArealplanIdMapper.Map(featureElement, document);
             rpArealformålOmråde.Vertikalnivå = rpOmrådeElement.XPath2SelectElement("*:vertikalnivå")?.Value;

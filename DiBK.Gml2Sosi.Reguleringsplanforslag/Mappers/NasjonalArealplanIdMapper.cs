@@ -13,12 +13,12 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
         {
             var arealplanElement = element.Document.Root.Descendants(Namespace.App + "Arealplan").FirstOrDefault();
             var kommunenummer = arealplanElement.XPath2SelectElement("*:nasjonalArealplanId//*:kommunenummer")?.Value;
-            var planidentifikasjon = arealplanElement.XPath2SelectElement("*:nasjonalArealplanId//*:planidentifikasjon")?.Value;
+            var planId = arealplanElement.XPath2SelectElement("*:nasjonalArealplanId//*:planid")?.Value;
 
             return new NasjonalArealplanId
             {
                 Kommunenummer = kommunenummer,
-                Planidentifikasjon = planidentifikasjon
+                PlanId = planId
             };
         }
     }

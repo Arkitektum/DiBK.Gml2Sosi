@@ -4,6 +4,6 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Constants
 {
     public class Namespace
     {
-        public static readonly XNamespace App = "http://skjema.geonorge.no/SOSI/produktspesifikasjon/Reguleringsplanforslag/5.0";
+        public static readonly XNamespace App = "http://skjema.geonorge.no/SOSI/produktspesifikasjon/Reguleringsplanforslag/20230701";
     }
 }

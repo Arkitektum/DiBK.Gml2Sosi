@@ -6,7 +6,7 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Models.SosiObjects
     {
         [SosiProperty("...SAKSÅR", 0)]
         public string Saksår { get; set; }
-        [SosiProperty("...SAKSSEKVENSNUMME", 1)]
+        [SosiProperty("...SAKSSEKVENSNUMMER", 1)]
         public string Sakssekvensnummer { get; set; }
     }
 }
