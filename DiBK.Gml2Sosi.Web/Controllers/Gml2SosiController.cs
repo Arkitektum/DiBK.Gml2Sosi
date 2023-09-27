@@ -1,3 +1,4 @@
+using DiBK.Gml2Sosi.Application.Helpers;
 using DiBK.Gml2Sosi.Application.Services.Gml2Sosi;
 using DiBK.Gml2Sosi.Application.Services.MultipartRequest;
 using Microsoft.AspNetCore.Mvc;
@@ -29,6 +30,11 @@ namespace DiBK.Gml2Sosi.Web.Controllers
 
                 if (gmlFile == null)
                     return BadRequest();
+
+                var defaultNs = GmlHelper.GetDefaultNamespace(gmlFile);
+
+                if (defaultNs != Reguleringsplanforslag.Constants.Namespace.App.NamespaceName)
+                    return BadRequest($"Ugyldig navneområde: {defaultNs}. Forventet navneområde: {Reguleringsplanforslag.Constants.Namespace.App.NamespaceName}");
 
                 var document = await _rpfGml2SosiService.Gml2SosiAsync(gmlFile);
 

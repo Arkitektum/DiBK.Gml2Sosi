@@ -31,7 +31,7 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
             var rpJuridiskLinje = MapCurveObject<RpJuridiskLinje>(featureElement, geomElement, document, _settings.Resolution);
 
             rpJuridiskLinje.NasjonalArealplanId = _nasjonalArealplanIdMapper.Map(featureElement, document);
-            rpJuridiskLinje.JuridiskLinje = featureElement.XPath2SelectElement("*:juridisklinje")?.Value;
+            rpJuridiskLinje.JuridiskLinje = featureElement.XPath2SelectElement("*:juridiskLinjetype")?.Value;
 
             var rpOmrådeElement = GetRpOmrådeElementByGeometry(featureElement, document);
 

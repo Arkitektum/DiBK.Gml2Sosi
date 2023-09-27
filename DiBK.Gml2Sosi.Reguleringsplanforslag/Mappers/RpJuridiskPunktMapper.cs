@@ -38,7 +38,7 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
 
             rpJuridiskPunkt.NasjonalArealplanId = _nasjonalArealplanIdMapper.Map(featureElement, document);
             rpJuridiskPunkt.Kvalitet = _codelistHttpClient.GetMålemetodeAsync(featureElement).Result;
-            rpJuridiskPunkt.JuridiskPunkt = featureElement.XPath2SelectElement("*:juridiskpunkt")?.Value;
+            rpJuridiskPunkt.JuridiskPunkt = featureElement.XPath2SelectElement("*:juridiskPunkttype")?.Value;
             rpJuridiskPunkt.Points = GetPoints(featureElement);
             rpJuridiskPunkt.ElementType = CartographicElementType.Symbol;
 
@@ -53,14 +53,14 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
         private List<SosiPoint> GetPoints(XElement element)
         {
             var geomElement = element.XPath2SelectElement("*:posisjon/*");
-            var symbolretning = element.XPath2SelectElement("*:symbolretning")?.Value;
+            var retningsvektor = element.XPath2SelectElement("*:retningsvektor")?.Value;
             var point = GeometryHelper.GetSosiPoints(geomElement, _settings.Resolution).SingleOrDefault();
             var points = new List<SosiPoint> { point };
 
-            if (string.IsNullOrWhiteSpace(symbolretning))
+            if (string.IsNullOrWhiteSpace(retningsvektor))
                 return points;
 
-            var vectorPoints = symbolretning.Split(" ");
+            var vectorPoints = retningsvektor.Split(" ");
 
             if (vectorPoints.Length != 2 || !double.TryParse(vectorPoints[0].Trim(), out var vectorPointX) || !double.TryParse(vectorPoints[1].Trim(), out var vectorPointY))
                 return points;

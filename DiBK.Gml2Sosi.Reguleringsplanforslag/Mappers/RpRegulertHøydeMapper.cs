@@ -36,7 +36,7 @@ namespace DiBK.Gml2Sosi.Reguleringsplanforslag.Mappers
 
             var høydeFraPlanbestemmelseElement = featureElement.XPath2SelectElement("*:høydeFraPlanbestemmelse/*:HøydeFraPlanbestemmelse");
 
-            rpRegulertHøyde.HøydeFraPlanbestemmelse.Regulerthøyde = høydeFraPlanbestemmelseElement.XPath2SelectElement("*:regulerthøyde")?.Value;
+            rpRegulertHøyde.HøydeFraPlanbestemmelse.Regulerthøyde = høydeFraPlanbestemmelseElement.XPath2SelectElement("*:regulertHøyde")?.Value;
             rpRegulertHøyde.HøydeFraPlanbestemmelse.Høydereferansesystem = høydeFraPlanbestemmelseElement.XPath2SelectElement("//*:høydereferansesystem")?.Value;
 
             return rpRegulertHøyde;

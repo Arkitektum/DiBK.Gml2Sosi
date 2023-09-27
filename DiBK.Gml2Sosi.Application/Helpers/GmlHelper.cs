@@ -1,5 +1,7 @@
 ﻿using DiBK.Gml2Sosi.Application.Constants;
 using DiBK.Gml2Sosi.Application.Models;
+using Microsoft.AspNetCore.Http;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
@@ -9,6 +11,8 @@ namespace DiBK.Gml2Sosi.Application.Helpers
     {
         private static readonly Regex _srsNameRegex =
             new(@"^(http:\/\/www\.opengis\.net\/def\/crs\/EPSG\/0\/|urn:ogc:def:crs:EPSG::)(?<epsg>\d+)$", RegexOptions.Compiled);
+
+        private static readonly Regex _schemaLocationRegex = new(@"xsi:schemaLocation=""(?<schema_loc>(.*?))""", RegexOptions.Compiled);
 
         public static string GetFeatureType(XElement element)
         {
@@ -81,6 +85,37 @@ namespace DiBK.Gml2Sosi.Application.Helpers
             var epsg = match.Groups["epsg"].Value;
 
             return coordinateSystems.TryGetValue(epsg, out var coordinateSystem) ? coordinateSystem : string.Empty;
+        }
+
+        public static string GetDefaultNamespace(IFormFile gmlFile)
+        {
+            var xmlString = ReadLines(gmlFile.OpenReadStream(), 100);
+            var match = _schemaLocationRegex.Match(xmlString);
+
+            if (!match.Success)
+                return null;
+
+            var values = match.Groups["schema_loc"].Value.Split(" ");
+
+            return values.ElementAtOrDefault(0);
+        }
+
+        public static string ReadLines(Stream stream, int numberOfLines)
+        {
+            if (numberOfLines < 1)
+                throw new ArgumentException("numberOfLines må være større enn 0");
+
+            var counter = 0;
+            var stringBuilder = new StringBuilder(numberOfLines * 250);
+
+            using var streamReader = new StreamReader(stream, leaveOpen: true);
+
+            while (counter++ < numberOfLines && !streamReader.EndOfStream)
+                stringBuilder.Append(streamReader.ReadLine());
+
+            stream.Position = 0;
+
+            return stringBuilder.ToString();
         }
     }
 }
